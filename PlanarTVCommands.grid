@@ -13,6 +13,7 @@
          <param access="1" constrainttype="INT_NULL" name="tv1.volumeAfterMute" oid="tv1.volumeAfterMute" precision="0" type="INT16" value="10" widget="default"/>
          <param access="1" maxlength="0" name="messageToLog" oid="messageToLog" type="STRING" value="And more." widget="text"/>
       </params>
+      <api id="logFile" immediate="true" name="logFile" src="logfile.js"/>
       <api id="PlanarTVScripts" immediate="true" name="PlanarTVScripts" src="PlanarTVScripts.grid.js"/>/* This is the listener that should hear the response from the TV over port 5000.*/<listener autostart="true" connecthost="params.getValue('testTV1_IP', 0)" connectport="5000" delimiter="9" delimitertype="fixedlen" id="planarListener" name="planarListener" syncword="21">
          <task tasktype="ogscript">if (event.isConnectEvent())
 {
@@ -133,7 +134,7 @@ setVolume(params.getValue('tv1.volume', 0), params.getValue('testTV1_IP', 0))
 /*!!&lt;checksum&gt;bc4c70974b1953f97d152066a26efb5f&lt;/checksum&gt;!!*/</task>
    </param>
    <param expand="true" height="1239" left="2388" oid="tv1.volume" showlabel="false" top="258" widget="level-meter" width="45"/>
-   
+
    <param expand="true" height="80" left="278" oid="messageToLog" top="1396" width="824"/>
    <button buttontype="push" height="79" left="1132" name="Send to Log File" top="1396" width="488">
       <task tasktype="ogscript">/*! block id=1002,1001 !*/
