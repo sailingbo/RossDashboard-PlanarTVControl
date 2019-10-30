@@ -9,7 +9,7 @@
          <param access="1" maxlength="0" name="IntegerToConvert" oid="IntegerToConvert" type="STRING" value="63" widget="text"/>
          <param access="1" maxlength="0" name="Converted Into Hex:" oid="Converted_Into_Hex" type="STRING" value="" widget="label"/>
          <param access="1" maxlength="0" name="HexToConvert" oid="HexToConvert" type="STRING" value="63" widget="text"/>
-         <param access="1" constraint="0.0;100.0;0.0;100.0;1" constrainttype="INT_STEP_RANGE" name="tv1.volume" oid="tv1.volume" precision="0" type="INT16" value="54" widget="slider-vertical"/>
+         <param access="1" constraint="0.0;100.0;0.0;100.0;1" constrainttype="INT_STEP_RANGE" name="tv1.volume" oid="tv1.volume" precision="0" type="INT16" value="44" widget="slider-vertical"/>
          <param access="1" constrainttype="INT_NULL" name="tv1.volumeAfterMute" oid="tv1.volumeAfterMute" precision="0" type="INT16" value="10" widget="default"/>
          <param access="1" maxlength="0" name="messageToLog" oid="messageToLog" type="STRING" value="And more." widget="text"/>
       </params>
@@ -64,7 +64,7 @@ else
       </tr>
       <tr>
          <button buttontype="push" colspan="1" fill="both" name="Set Volume to 8%" rowspan="1" weightx="1.0" weighty="1.0">
-            <task tasktype="ogscript">ogscript.debug("Set volume to 8% button pushed.");
+            <task tasktype="ogscript">/*ogscript.debug("Set volume to 8% button pushed.");
 // rosstalk.sendAsBytes(params.getParam("_top", 'testTV1_IP', 0).getValue(), 5000, 'A6 01 00 00 00 05 01 44 08 08 E7', callback);
 var listener = ogscript.getObject("listener");
 if (listener != null)
@@ -75,7 +75,15 @@ if (listener != null)
 else
 {
    ogscript.debug("No listener connection found");
-}</task>
+}*/</task>
+            <task tasktype="ogscript">/*! block id=1004,1005,1006 !*/
+setVolume(params.getParam("_top", 'tv1.volume', 0).getValue(), params.getParam("_top", 'testTV1_IP', 0).getValue())
+/*!!
+ &lt;block id="1004" type="function_setVolume" x="416" y="108" w="242" volumeLevel="ID:1005" tvIPAddress="ID:1006" /&gt;
+&lt;block id="1005" type="param__top&amp;amp;tv1.volume (tv1.volume)[0]" x="95" y="97" w="242" SET="" /&gt;
+&lt;block id="1006" type="param__top&amp;amp;testTV1_IP (testTV1_IP)[0]" x="99" y="190" w="242" SET="" /&gt;
+!!*/
+/*!!&lt;checksum&gt;9c1a30018f6db64f81ef129047968267&lt;/checksum&gt;!!*/</task>
          </button>
          <button buttontype="push" colspan="1" fill="both" name="Set Volume to 10%" rowspan="1" weightx="1.0" weighty="1.0">
             <task tasktype="ogscript">ogscript.debug("Set volume to 10% button pushed.");
@@ -127,14 +135,14 @@ ogscript.debug('Converted back to Int: ' + convertedInteger);</task>
       </tr>
    </table>
    <param bottom="392" expand="true" left="2190" oid="tv1.volume" right="401" showlabel="false" style="look:flat;" top="248" widget="slider-vertical">
-      <task tasktype="ogscript">/*! block id=1000,1001,1002 !*/
+      <task tasktype="ogscript">/*! block id=1000,1007,1008 !*/
 setVolume(params.getValue('tv1.volume', 0), params.getValue('testTV1_IP', 0))
 /*!!
- &lt;block id="1000" type="function_setVolume" x="741" y="231" w="242" volumeLevel="ID:1001" tvIPAddress="ID:1002" /&gt;
-&lt;block id="1001" type="param__top&amp;amp;tv1.volume (tv1.volume)[0]" x="306" y="240" w="242" SET="" /&gt;
-&lt;block id="1002" type="param__top&amp;amp;testTV1_IP (testTV1_IP)[0]" x="323" y="332" w="242" SET="" /&gt;
+ &lt;block id="1000" type="function_setVolume" x="668" y="268" w="240" volumeLevel="ID:1007" tvIPAddress="ID:1008" /&gt;
+&lt;block id="1007" type="param__top&amp;amp;tv1.volume (tv1.volume)[0]" x="310" y="131" w="242" SET="" /&gt;
+&lt;block id="1008" type="param__top&amp;amp;testTV1_IP (testTV1_IP)[0]" x="298" y="315" w="242" SET="" /&gt;
 !!*/
-/*!!&lt;checksum&gt;bc4c70974b1953f97d152066a26efb5f&lt;/checksum&gt;!!*/</task>
+/*!!&lt;checksum&gt;acfcd68e47009320955362f46b6e9574&lt;/checksum&gt;!!*/</task>
    </param>
    <param expand="true" height="1239" left="2388" oid="tv1.volume" showlabel="false" top="258" widget="level-meter" width="45"/>
    <param expand="true" height="80" left="278" oid="messageToLog" top="1396" width="824"/>

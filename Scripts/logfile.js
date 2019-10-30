@@ -21,7 +21,7 @@ var logFile = (function() {
   function write(message) {
     var time = new Date();
     var time = addLeadingZero(time.getHours()) + ":" + addLeadingZero(time.getMinutes()) + ":" + addLeadingZero(time.getSeconds());
-    file.writeString(date + " " + time + ": " + message + "\n");
+    file.writeString(date + " " + time + ": " + message + "\r\n");
   }
 
   function clear() {

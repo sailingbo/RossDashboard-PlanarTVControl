@@ -46,38 +46,37 @@ function callback(success, sentData, resultString, exception) {
     // ogscript.debug("Result String via Callback: " + resultString);
     var hexString = toHexString(resultString);
     var percentageVolume = resultString[8].toString(10);
-    ogscript.debug("Resulting Hex String: " + hexString);
+    // ogscript.debug("Resulting Hex String: " + hexString);
     ogscript.debug("Volume Percentage: " + percentageVolume + "%");
     return resultString;
-
   }
-
 }
 
 // This function takes a volume INT and converts it to a string to be sent to the TV
-function setVolume(volumeLevel, tvIPAddress) {
+function setVolume(volumeLevel, tvIPAddress, listener) {
   hexVolume = toHex(volumeLevel);
   var setVolumeCommand = "A6 01 00 00 00 05 01 44 " + hexVolume + " " + hexVolume;
   // ogscript.debug("Volume in hex: " + hexVolume);
   // ogscript.debug("Command to send before checksum: " + setVolumeCommand);
   var checksum = LRC(setVolumeCommand.replace(/\s/g, "")).toUpperCase();
-  ogscript.debug("Checksum: " + checksum);
+  // ogscript.debug("Checksum: " + checksum);
   var setVolumeCommand = setVolumeCommand + " " + checksum;
-  ogscript.debug("Final command to send to tv: " + setVolumeCommand);
+  // ogscript.debug("Final command to send to tv: " + setVolumeCommand);
+  // logFile.write("Final command to send to tv: " + setVolumeCommand);
   // Send command to TV now.
-  sendToTV(setVolumeCommand, tvIPAddress);
+  sendToTV(setVolumeCommand, tvIPAddress, listener);
 }
 
 // This function sends a command to the TV.
-function sendToTV(command, tvIPAddress) {
-  var listener = ogscript.getObject('listener');
+function sendToTV(command, tvIPAddress, listener) {
+  var listener = ogscript.getObject(listener);
   if (listener != null){
-    logFile.write("Message written to listener.");
+    logFile.write("Command sent to TV: " + command);
     listener.writeAsBytes(command);
   }
   else {
-    logFile.write("No listener connection found. Message will be attempted via sendAsBytes.");
-    rosstalk.sendAsBytes(tvIPAddress, 5000, command, callback);
+    logFile.write("No listener connection found. Maybe try sendAsBytes?");
+    // rosstalk.sendAsBytes(tvIPAddress, 5000, command, callback);
   }
 }
 
