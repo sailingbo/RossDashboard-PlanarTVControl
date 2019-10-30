@@ -58,14 +58,27 @@ function callback(success, sentData, resultString, exception) {
 function setVolume(volumeLevel, tvIPAddress) {
   hexVolume = toHex(volumeLevel);
   var setVolumeCommand = "A6 01 00 00 00 05 01 44 " + hexVolume + " " + hexVolume;
-  ogscript.debug("Volume in hex: " + hexVolume);
-  ogscript.debug("Command to send before checksum: " + setVolumeCommand);
+  // ogscript.debug("Volume in hex: " + hexVolume);
+  // ogscript.debug("Command to send before checksum: " + setVolumeCommand);
   var checksum = LRC(setVolumeCommand.replace(/\s/g, "")).toUpperCase();
   ogscript.debug("Checksum: " + checksum);
   var setVolumeCommand = setVolumeCommand + " " + checksum;
   ogscript.debug("Final command to send to tv: " + setVolumeCommand);
   // Send command to TV now.
+  sendToTV(setVolumeCommand, tvIPAddress);
+}
 
+// This function sends a command to the TV.
+function sendToTV(command, tvIPAddress) {
+  var listener = ogscript.getObject('listener');
+  if (listener != null){
+    logFile.write("Message written to listener.");
+    listener.writeAsBytes(command);
+  }
+  else {
+    logFile.write("No listener connection found. Message will be attempted via sendAsBytes.");
+    rosstalk.sendAsBytes(tvIPAddress, 5000, command, callback);
+  }
 }
 
 // This function calculates the proper checksum for Planar TVs
@@ -83,40 +96,6 @@ function LRC(hexstring) {
       lrc = "0" + lrc;
     return lrc;
   } else {
-    debug("Hexstring is null.");
+    ogscript.debug("Hexstring is null.");
   }
 }
-
-// This function adds to a log file. logFile.write(message) or logFile.clear()
-var logFile = (function() {
-
-  function addLeadingZero(n) {
-    if (n <= 9) {
-      return "0" + n;
-    }
-    return n;
-  }
-
-  var date = new Date();
-  var date = date.getFullYear() + "-" + addLeadingZero((date.getMonth() + 1)) + "-" + addLeadingZero(date.getDay());
-  var file = ogscript.createFileOutput("./Logs/" + date + ".log", true);
-
-  // This appends a message string to the file.
-  function write(message) {
-    var time = new Date();
-    var time = addLeadingZero(time.getHours()) + ":" + addLeadingZero(time.getMinutes()) + ":" + addLeadingZero(time.getSeconds());
-    file.writeString(date + " " + time + ": " + message + "\n");
-  }
-
-  // This clears the contents of the current log file.
-  function clear() {
-    file.clear();
-  }
-  //Is this ok?
-  
-
-  return {
-    write: write,
-    clear: clear
-  }
-}());

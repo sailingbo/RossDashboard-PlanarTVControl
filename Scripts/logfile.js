@@ -1,4 +1,10 @@
-// This function adds to a log file. logFile.write(message) or logFile.clear()
+/** This function creates a text log file in the /logs/
+ * folder with the current days date as a file name.
+ *
+ * logfile.write(message), logfile.clear()
+ *
+ * bocordle@sailingbo.com 10/28/2019
+ */
 var logFile = (function() {
 
   function addLeadingZero(n) {
@@ -10,16 +16,14 @@ var logFile = (function() {
 
   var date = new Date();
   var date = date.getFullYear() + "-" + addLeadingZero((date.getMonth() + 1)) + "-" + addLeadingZero(date.getDay());
-  var file = ogscript.createFileOutput("./Logs/" + date + ".log", true);
+  var file = ogscript.createFileOutput("./logs/" + date + ".log", true);
 
-  // This appends a message string to the file.
   function write(message) {
     var time = new Date();
     var time = addLeadingZero(time.getHours()) + ":" + addLeadingZero(time.getMinutes()) + ":" + addLeadingZero(time.getSeconds());
     file.writeString(date + " " + time + ": " + message + "\n");
   }
 
-  // This clears the contents of the current log file.
   function clear() {
     file.clear();
   }

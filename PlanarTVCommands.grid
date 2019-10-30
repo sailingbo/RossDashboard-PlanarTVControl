@@ -13,16 +13,18 @@
          <param access="1" constrainttype="INT_NULL" name="tv1.volumeAfterMute" oid="tv1.volumeAfterMute" precision="0" type="INT16" value="10" widget="default"/>
          <param access="1" maxlength="0" name="messageToLog" oid="messageToLog" type="STRING" value="And more." widget="text"/>
       </params>
-      <api id="logFile" immediate="true" name="logFile" src="logfile.js"/>
-      <api id="PlanarTVScripts" immediate="true" name="PlanarTVScripts" src="PlanarTVScripts.grid.js"/>/* This is the listener that should hear the response from the TV over port 5000.*/<listener autostart="true" connecthost="params.getValue('testTV1_IP', 0)" connectport="5000" delimiter="9" delimitertype="fixedlen" id="planarListener" name="planarListener" syncword="21">
+      <api id="logFile" immediate="true" name="logFile" src="./scripts/logfile.js"/>
+      <api id="PlanarTVScripts" immediate="true" name="PlanarTVScripts" src="./scripts/PlanarTVScripts.grid.js"/>/* This is the listener that should hear the response from the TV over port 5000.*/<listener autostart="true" connecthost="params.getValue('testTV1_IP', 0)" connectport="5000" delimiter="9" delimitertype="fixedlen" id="planarListener" name="planarListener" syncword="21">
          <task tasktype="ogscript">if (event.isConnectEvent())
 {
    ogscript.debug('The listener is connected.');
+   logfile.write('The listener is connected.');
    ogscript.putObject('listener', this);
 }
-else if (event.isMessageEvent()) 
+else if (event.isMessageEvent())
 {
       ogscript.debug('The listener received a message.');
+      logfile.write('The listener received a message.');
       var messageAsString = event.getBytesAsString();
       var messageAsByteArray = event.getBytes();
       ogscript.debug('The listener heard this Byte String: ' + messageAsString);
@@ -37,6 +39,7 @@ else if (event.isMessageEvent())
 else if (event.isDisconnectEvent())
 {
    ogscript.debug('The listener is gone.');
+   logfile.write('The listener is gone.');
    ogscript.putObject('listener', null);
 }</task>
       </listener>
@@ -134,7 +137,6 @@ setVolume(params.getValue('tv1.volume', 0), params.getValue('testTV1_IP', 0))
 /*!!&lt;checksum&gt;bc4c70974b1953f97d152066a26efb5f&lt;/checksum&gt;!!*/</task>
    </param>
    <param expand="true" height="1239" left="2388" oid="tv1.volume" showlabel="false" top="258" widget="level-meter" width="45"/>
-
    <param expand="true" height="80" left="278" oid="messageToLog" top="1396" width="824"/>
    <button buttontype="push" height="79" left="1132" name="Send to Log File" top="1396" width="488">
       <task tasktype="ogscript">/*! block id=1002,1001 !*/
@@ -158,13 +160,10 @@ ogscript.reload("_top");
 !!*/
 /*!!&lt;checksum&gt;1d429afb92dad66b9152baaa437fe09a&lt;/checksum&gt;!!*/</task>
    </button>
-<table height="1243" left="2450" top="254" width="130">
+   <table height="1243" left="2450" top="254" width="130">
       <tr>
          <button buttontype="push" colspan="1" fill="both" name="Vol UP" rowspan="1" weightx="1.0" weighty="1.0">
-            <task tasktype="ogscript">
-
-
-/*! block id=1001 !*/
+            <task tasktype="ogscript">/*! block id=1001 !*/
 params.setValue('tv1.volume', 0, params.getValue('tv1.volume', 0) + 1);
 /*!!
  &lt;block id="1001" type="math_increment_param" x="119" y="174" w="267" PARAM="[root, Params for PlanarTVviaListener_v6.grid, Not In Menu, tv1.volume (tv1.volume)]" VALUE="1" /&gt;
@@ -174,10 +173,7 @@ params.setValue('tv1.volume', 0, params.getValue('tv1.volume', 0) + 1);
       </tr>
       <tr>
          <button buttontype="push" colspan="1" fill="both" name="Vol Down" rowspan="1" weightx="1.0" weighty="1.0">
-            <task tasktype="ogscript">
-
-
-/*! block id=1002 !*/
+            <task tasktype="ogscript">/*! block id=1002 !*/
 params.setValue('tv1.volume', 0, params.getValue('tv1.volume', 0) + -1);
 /*!!
  &lt;block id="1002" type="math_increment_param" x="281" y="216" w="267" PARAM="[root, Params for PlanarTVviaListener_v6.grid, Not In Menu, tv1.volume (tv1.volume)]" VALUE="-1" /&gt;
