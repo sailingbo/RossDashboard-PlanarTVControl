@@ -47,9 +47,18 @@ function callback(success, sentData, resultString, exception) {
     var hexString = toHexString(resultString);
     var percentageVolume = resultString[8].toString(10);
     // ogscript.debug("Resulting Hex String: " + hexString);
-    ogscript.debug("Volume Percentage: " + percentageVolume + "%");
+    // ogscript.debug("Volume Percentage: " + percentageVolume + "%");
     return resultString;
   }
+}
+
+// This function takes a volume INT and converts it to a string to be sent to the TV
+function getVolume(tvIPAddress, listener) {
+  logFile.write("Get Volume Button Pushed.");
+  var getVolumeCommand = "A6 01 00 00 00 03 01 45 E0";
+  // logFile.write("Final command to send to tv: " + setVolumeCommand);
+  // Send command to TV now.
+  sendToTV(getVolumeCommand, tvIPAddress, listener);
 }
 
 // This function takes a volume INT and converts it to a string to be sent to the TV

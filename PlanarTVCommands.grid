@@ -123,19 +123,7 @@ else if (event.isDisconnectEvent())
       </tr>
       <tr>
          <button buttontype="push" colspan="3" fill="both" name="Get Volume" rowspan="1" weightx="1.0" weighty="1.0">
-            <task tasktype="ogscript">// ogscript.debug("Get Volume Button Pushed.");
-  // rosstalk.sendAsBytesWithResponse(params.getParam("_top", 'testTV1_IP', 0).getValue(), 5000, 'A6 01 00 00 00 03 01 45 E0', '61', callback);
-
-var listener = ogscript.getObject("listener_tv1");
-if (listener != null)
-{
-   ogscript.debug("Message written to listener");
-   listener.writeAsBytes('A6 01 00 00 00 03 01 45 E0');
-}
-else
-{
-   ogscript.debug("No listener connection found");
-}</task>
+            <task tasktype="ogscript">getVolume(params.getParam("_top", 'TV1_IP', 0).getValue(), 'listener_tv1');</task>
          </button>
       </tr>
       <tr>
