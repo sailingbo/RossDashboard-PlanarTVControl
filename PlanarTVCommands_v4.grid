@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?><abs contexttype="opengear" id="_top" keepalive="true" virtualheight="1891" virtualwidth="2787">
+   <meta>
+      <lookup id="hosts">
+         <entry key="TV1.host">192.168.100.228</entry>
+         <entry key="TV1.port">5000</entry>
+         <entry key="TV2.host">192.168.100.229</entry>
+         <entry key="TV2.port">5000</entry>
+      </lookup>
+      <params>
+         <param access="1" maxlength="0" name="testTV1_IP" oid="testTV1_IP" type="STRING" value="192.168.100.228" widget="default"/>
+         <param access="1" maxlength="0" name="IntegerToConvert" oid="IntegerToConvert" type="STRING" value="63" widget="text"/>
+         <param access="1" maxlength="0" name="Converted Into Hex:" oid="Converted_Into_Hex" type="STRING" value="" widget="label"/>
+         <param access="1" maxlength="0" name="HexToConvert" oid="HexToConvert" type="STRING" value="63" widget="text"/>
+         <param access="1" constraint="0.0;100.0;0.0;100.0;1" constrainttype="INT_STEP_RANGE" name="tv1.volume" oid="tv1.volume" precision="0" type="INT16" value="0" widget="slider-vertical"/>
+         <param access="1" constrainttype="INT_NULL" name="tv1.volumeAfterMute" oid="tv1.volumeAfterMute" precision="0" type="INT16" value="8" widget="default"/>
+         <param access="1" maxlength="0" name="messageToLog" oid="messageToLog" type="STRING" value="And more." widget="text"/>
+         <param access="1" maxlength="0" name="TV1_IP" oid="TV1_IP" type="STRING" value="192.168.100.228" widget="default"/>
+         <param access="1" maxlength="0" name="TV2_IP" oid="TV2_IP" type="STRING" value="192.168.100.229" widget="default"/>
+         <param access="1" constraint="0.0;100.0;0.0;100.0;1" constrainttype="INT_STEP_RANGE" name="tv2.volume" oid="tv2.volume" precision="0" type="INT16" value="1" widget="slider-vertical"/>
+         <param access="1" constrainttype="INT_NULL" name="tv2.volumeAfterMute" oid="tv2.volumeAfterMute" precision="0" type="INT16" value="10" widget="default"/>
+         <param access="1" constraintstrict="false" constrainttype="STRING_STRING_CHOICE" maxlength="0" name="TV 1 Mute" oid="TV1_MUTE" type="STRING" value="0" widget="default">
+            <constraint key="0">MUTE OFF</constraint>
+            <constraint key="1">MUTE ON</constraint>
+         </param>
+         <param access="1" constraintstrict="false" constrainttype="STRING_STRING_CHOICE" maxlength="0" name="TV 2 Mute" oid="TV2_MUTE" type="STRING" value="" widget="default">
+            <constraint key="0">MUTE OFF</constraint>
+            <constraint key="1">MUTE ON</constraint>
+         </param>
+      </params>
+      <api id="conversions" immediate="true" name="conversions" src="./scripts/conversions.js"/>
+      <api id="logFile" immediate="true" name="logFile" src="./scripts/logfile.js"/>
+      <api id="PlanarTVScripts" immediate="true" name="PlanarTVScripts" src="./scripts/PlanarTVScripts.grid.js"/>
+      <!-- This is the listener that should hear the response from the TV over port 5000. -->
+      <listener autostart="true" connecthost="%const['hosts']['TV1.host']%" connectport="%const['hosts']['TV1.port']%" delimiter="9" delimitertype="fixedlen" id="planarListener_tv1" name="planarListener_tv1" syncword="21">
+         <task tasktype="ogscript">if (event.isConnectEvent())
+{
+   ogscript.debug('Listener 1 is connected.');
+   logFile.write('Listener 1 is connected.');
+   ogscript.putObject('listener_tv1', this);
+}
+else if (event.isMessageEvent())
+{
+      // ogscript.debug('The listener 1 received a message.');
+      logFile.write('The listener 1 received a message.');
+      var messageAsString = event.getBytesAsString();
+      var messageAsByteArray = event.getBytes();
+      var commandReceived = messageAsByteArray[5].toString(16);
+      // ogscript.debug('The listener heard this Byte String: ' + messageAsString);
+      ogscript.debug('The listener heard this Hex String: ' + convert.toHexString(messageAsByteArray));
+      // ogscript.debug('The listener heard this Byte Array: ' + messageAsByteArray);
+      if (commandReceived == 45) {
+         var volumeFromTV = messageAsByteArray[6].toString(10);
+         ogscript.debug("TV 1's volume is: " + messageAsByteArray[6].toString(10) + "%");
+         //params.setValue('tv1.volume', 0, volumeFromTV);
+      }
+      else if (commandReceived == 00) {
+         ogscript.debug('Message received was a good ACK from TV 1.');
+      }
+      else if (commandReceived == 03) {
+         ogscript.debug('Message received was NAK from TV 1.');
+      }
+      else if (commandReceived == 04) {
+         ogscript.debug('Message received was NAV from TV 1.');
+      }
+      else {
+         ogscript.debug('Message received was unreadable from TV 1.');
+      }
+}
+else if (event.isDisconnectEvent())
+{
+   ogscript.debug('Listener 1 is gone.');
+   logFile.write('Listener 1 is gone.');
+   ogscript.putObject('listener_tv1', null);
+}</task>
+      </listener>
+      <!-- This is the listener that should hear the response from the TV over port 5000. -->
+      <listener autostart="true" connecthost="%const['hosts']['TV2.host']%" connectport="%const['hosts']['TV2.port']%" delimiter="9" delimitertype="fixedlen" id="planarListener_tv2" name="planarListener_tv2" syncword="21">
+         <task tasktype="ogscript">if (event.isConnectEvent())
+{
+   ogscript.debug('Listener 2 is connected.');
+   logFile.write('Listener 2 is connected.');
+   ogscript.putObject('listener_tv2', this);
+}
+else if (event.isMessageEvent())
+{
+      // ogscript.debug('The listener received a message.');
+      logFile.write('The listener 2 received a message.');
+      var messageAsString = event.getBytesAsString();
+      var messageAsByteArray = event.getBytes();
+      var commandReceived = messageAsByteArray[5].toString(16);
+      // ogscript.debug('The listener heard this Byte String: ' + messageAsString);
+      ogscript.debug('The listener heard this Hex String: ' + convert.toHexString(messageAsByteArray));
+      // ogscript.debug('The listener heard this Byte Array: ' + messageAsByteArray);
+      if (commandReceived == 45) {
+         var volumeFromTV = messageAsByteArray[6].toString(10);
+         ogscript.debug("TV 2's Volume: " + messageAsByteArray[6].toString(10) + "%");
+         params.setValue('tv2.volume', 0, volumeFromTV);
+      }
+      else {
+         ogscript.debug('Message received was just an ACK from tv 2.')
+      }
+}
+else if (event.isDisconnectEvent())
+{
+   ogscript.debug('Listener 2 is gone.');
+   logFile.write('Listener 2 is gone.');
+   ogscript.putObject('listener_tv2', null);
+}</task>
+      </listener>
+   </meta>
+   <table height="1173" left="113" top="48" width="657">
+      <tr>
+         <label anchor="center" colspan="3" fill="both" header="true" name="TV 1" weightx="1.0"/>
+      </tr>
+      <tr>
+         <button buttontype="push" colspan="3" fill="both" id="power.on" name="Power On" style="bg#timerfg;font:bold;size:Normal;">
+            <task tasktype="ogscript">rosstalk.sendAsBytes("192.168.100.228", 5000, "A6 01 00 00 00 04 01 18 02 B8", null);</task>
+         </button>
+      </tr>
+      <tr>
+         <button buttontype="push" colspan="3" fill="both" id="power.off" name="Power Off" style="bg#FF0000;font:bold;size:Normal;">
+            <task tasktype="ogscript">rosstalk.sendAsBytes("192.168.100.228", 5000, "A6 01 00 00 00 04 01 18 01 BB", null);</task>
+         </button>
+      </tr>
+      <tr>
+         <button buttontype="push" colspan="3" fill="both" name="Get Volume" rowspan="1" weightx="1.0" weighty="1.0">
+            <task tasktype="ogscript">getVolume(params.getParam("_top", 'TV1_IP', 0).getValue(), 'listener_tv1');</task>
+         </button>
+      </tr>
+      <tr>
+         <param bottom="392" colspan="1" expand="true" fill="both" left="2190" oid="tv1.volume" right="401" rowspan="2" showlabel="false" style="look:flat;" top="248" weightx=".5" weighty="1.0" widget="slider-vertical">
+            <task tasktype="ogscript">setVolume(params.getValue('tv1.volume', 0), params.getValue('testTV1_IP', 0), 'listener_tv1')</task>
+         </param>
+         <param colspan="1" expand="true" fill="both" left="2388" oid="tv1.volume" rowspan="2" showlabel="false" top="258" weightx="1.0" weighty="1.0" widget="level-meter" width="50"/>
+         <button buttontype="push" colspan="1" fill="both" name="Vol UP" rowspan="1" weightx=".5" weighty="1.0">
+            <task tasktype="ogscript">params.setValue('tv1.volume', 0, params.getValue('tv1.volume', 0) + 1);</task>
+            <task tasktype="ogscript"/>
+         </button>
+      </tr>
+      <tr>
+         <button buttontype="push" colspan="1" fill="both" name="Vol Down" rowspan="1" weightx="1.0" weighty="1.0">
+            <task tasktype="ogscript">/*! block id=1002 !*/
+params.setValue('tv1.volume', 0, params.getValue('tv1.volume', 0) + -1);
+/*!!
+ &lt;block id="1002" type="math_increment_param" x="281" y="216" w="267" PARAM="[root, Params for PlanarTVviaListener_v6.grid, Not In Menu, tv1.volume (tv1.volume)]" VALUE="-1" /&gt;
+!!*/
+/*!!&lt;checksum&gt;5d4301bda89d829df62840e38e894e7c&lt;/checksum&gt;!!*/</task>
+         </button>
+      </tr>
+      <tr>
+         <param colspan="3" expand="true" fill="both" oid="TV1_MUTE" showlabel="false" style="style:toggleButton;t:bg#FF1111;" widget="toggle">
+            <task tasktype="ogscript">if (params.getValue('TV1_MUTE', 0)  ==  0)
+{
+	params.setValue('tv1.volume', 0, params.getValue('tv1.volumeAfterMute', 0));
+   ogscript.debug('Mute is off.  Reset to Volume After Mute.');
+} else {
+   params.setValue('tv1.volumeAfterMute', 0, params.getValue('tv1.volume', 0));
+   ogscript.debug('Mute is on. Set volume to zero.');
+	params.setValue('tv1.volume', 0, 0);
+}</task>
+         </param>
+      </tr>
+      <tr>
+         <label fill="both" header="true" name="TV 1 IP Address"/>
+         <param colspan="2" expand="true" fill="both" oid="TV1_IP" rowspan="1" weightx="1.0" weighty=".25">
+            <task tasktype="ogscript">/*! block id=1001,1000 !*/
+ogscript.putPrivateString("hosts", "TV1.host", params.getValue('TV1_IP', 0));</task>
+         </param>
+      </tr>
+   </table>
+   <table height="1174" left="928" top="47" width="657">
+      <tr>
+         <label anchor="center" colspan="3" fill="both" header="true" name="TV 2" weightx="1.0"/>
+      </tr>
+      <tr>
+         <button buttontype="push" colspan="3" fill="both" id="power.on" name="Power On" style="bg#timerfg;font:bold;size:Normal;">
+            <task tasktype="ogscript">rosstalk.sendAsBytes(params.getParam("_top", 'TV2_IP', 0).getValue(), 5000, "A6 01 00 00 00 04 01 18 02 B8", null);</task>
+         </button>
+      </tr>
+      <tr>
+         <button buttontype="push" colspan="3" fill="both" id="power.off" name="Power Off" style="bg#FF0000;font:bold;size:Normal;">
+            <task tasktype="ogscript">rosstalk.sendAsBytes(params.getParam("_top", 'TV2_IP', 0).getValue(), 5000, "A6 01 00 00 00 04 01 18 01 BB", null);</task>
+         </button>
+      </tr>
+      <tr>
+         <button buttontype="push" colspan="3" fill="both" name="Get Volume" rowspan="1" weightx="1.0" weighty="1.0">
+            <task tasktype="ogscript">ogscript.debug("Get Volume Button Pushed.");
+  // rosstalk.sendAsBytesWithResponse(params.getParam("_top", 'TV2_IP', 0).getValue(), 5000, 'A6 01 00 00 00 03 01 45 E0', '61', callback);
+
+var listener = ogscript.getObject("listener_tv2");
+if (listener != null)
+{
+   // ogscript.debug("Message written to listener 2");
+   listener.writeAsBytes('A6 01 00 00 00 03 01 45 E0');
+}
+else
+{
+   ogscript.debug("Listener 2 connection not found");
+}</task>
+         </button>
+      </tr>
+      <tr>
+         <param bottom="392" colspan="1" expand="true" fill="both" left="2190" oid="tv2.volume" right="401" rowspan="2" showlabel="false" style="look:flat;" top="248" weightx=".5" weighty="1.0">
+            <task tasktype="ogscript">setVolume(params.getValue('tv2.volume', 0), params.getValue('TV2_IP', 0), 'listener_tv2');</task>
+         </param>
+         <param colspan="1" expand="true" fill="both" left="2388" oid="tv2.volume" rowspan="2" showlabel="false" top="258" weightx="1.0" weighty="1.0" widget="level-meter" width="50"/>
+         <button buttontype="push" colspan="1" fill="both" name="Vol UP" rowspan="1" weightx=".5" weighty="1.0">
+            <task tasktype="ogscript">params.setValue('tv2.volume', 0, params.getValue('tv2.volume', 0) + 1);</task>
+         </button>
+      </tr>
+      <tr>
+         <button buttontype="push" colspan="1" fill="both" name="Vol Down" rowspan="1" weightx="1.0" weighty="1.0">
+            <task tasktype="ogscript">params.setValue('tv2.volume', 0, params.getValue('tv2.volume', 0) + -1);</task>
+         </button>
+      </tr>
+      <tr>
+         <label fill="both" header="true" name="TV 2 IP Address"/>
+         <param colspan="2" expand="true" fill="both" oid="TV2_IP" rowspan="1" weightx="1.0" weighty=".25">
+            <task tasktype="ogscript">ogscript.putPrivateString("hosts", "TV2.host", params.getValue('TV2_IP', 0));</task>
+         </param>
+      </tr>
+   </table>
+</abs>
