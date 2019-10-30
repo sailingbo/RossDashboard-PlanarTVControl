@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?><abs contexttype="opengear" id="_top" keepalive="true" virtualheight="1891" virtualwidth="2787">
+   <meta>
+      <lookup id="hosts">
+         <entry key="testTV1.host">params.getValue('testTV1_IP', 0)</entry>
+         <entry key="testTV1.port">5000</entry>
+      </lookup>
+      <params>
+         <param access="1" maxlength="0" name="testTV1_IP" oid="testTV1_IP" type="STRING" value="192.168.0.101" widget="default"/>
+         <param access="1" maxlength="0" name="IntegerToConvert" oid="IntegerToConvert" type="STRING" value="63" widget="text"/>
+         <param access="1" maxlength="0" name="Converted Into Hex:" oid="Converted_Into_Hex" type="STRING" value="" widget="label"/>
+         <param access="1" maxlength="0" name="HexToConvert" oid="HexToConvert" type="STRING" value="63" widget="text"/>
+         <param access="1" constraint="0.0;100.0;0.0;100.0;1" constrainttype="INT_STEP_RANGE" name="tv1.volume" oid="tv1.volume" precision="0" type="INT16" value="54" widget="slider-vertical"/>
+         <param access="1" constrainttype="INT_NULL" name="tv1.volumeAfterMute" oid="tv1.volumeAfterMute" precision="0" type="INT16" value="10" widget="default"/>
+         <param access="1" maxlength="0" name="messageToLog" oid="messageToLog" type="STRING" value="And more." widget="text"/>
+      </params>
+      <api id="PlanarTVScripts" immediate="true" name="PlanarTVScripts" src="PlanarTVScripts.grid.js"/>/* This is the listener that should hear the response from the TV over port 5000.*/<listener autostart="true" connecthost="params.getValue('testTV1_IP', 0)" connectport="5000" delimiter="9" delimitertype="fixedlen" id="planarListener" name="planarListener" syncword="21">
+         <task tasktype="ogscript">if (event.isConnectEvent())
+{
+   ogscript.debug('The listener is connected.');
+   ogscript.putObject('listener', this);
+}
+else if (event.isMessageEvent()) 
+{
+      ogscript.debug('The listener received a message.');
+      var messageAsString = event.getBytesAsString();
+      var messageAsByteArray = event.getBytes();
+      ogscript.debug('The listener heard this Byte String: ' + messageAsString);
+      ogscript.debug('The listener heard this Hex String: ' + toHexString(messageAsByteArray));
+      ogscript.debug('The listener heard this Byte Array: ' + messageAsByteArray);
+      if (messageAsByteArray[0] = 21) {
+         var volumeFromTV = messageAsByteArray[7].toString(10));
+         ogscript.debug('This is the volume % returned: ' + messageAsByteArray[7].toString(10));
+         params.setValue('tv1.volume', 0, volumeFromTV);
+      }
+}
+else if (event.isDisconnectEvent())
+{
+   ogscript.debug('The listener is gone.');
+   ogscript.putObject('listener', null);
+}</task>
+      </listener>
+   </meta>
+   <table height="400" left="220" top="225" width="1674">
+      <tr>
+         <button buttontype="push" colspan="2" fill="both" name="Send &quot;Get Volume&quot; Command via listener" rowspan="1" weightx="1.0" weighty="1.0">
+            <task tasktype="ogscript">ogscript.debug("Get Volume Button Pushed.");
+  // rosstalk.sendAsBytesWithResponse(params.getParam("_top", 'testTV1_IP', 0).getValue(), 5000, 'A6 01 00 00 00 03 01 45 E0', '61', callback);
+
+var listener = ogscript.getObject("listener");
+if (listener != null)
+{
+   ogscript.debug("Message written to listener");
+   listener.writeAsBytes('A6 01 00 00 00 03 01 45 E0');
+}
+else
+{
+   ogscript.debug("No listener connection found");
+}</task>
+         </button>
+      </tr>
+      <tr>
+         <button buttontype="push" colspan="1" fill="both" name="Set Volume to 8%" rowspan="1" weightx="1.0" weighty="1.0">
+            <task tasktype="ogscript">ogscript.debug("Set volume to 8% button pushed.");
+// rosstalk.sendAsBytes(params.getParam("_top", 'testTV1_IP', 0).getValue(), 5000, 'A6 01 00 00 00 05 01 44 08 08 E7', callback);
+var listener = ogscript.getObject("listener");
+if (listener != null)
+{
+   ogscript.debug("Message written to listener");
+   listener.writeAsBytes('A6 01 00 00 00 05 01 44 08 08 E7');
+}
+else
+{
+   ogscript.debug("No listener connection found");
+}</task>
+         </button>
+         <button buttontype="push" colspan="1" fill="both" name="Set Volume to 10%" rowspan="1" weightx="1.0" weighty="1.0">
+            <task tasktype="ogscript">ogscript.debug("Set volume to 10% button pushed.");
+//rosstalk.sendAsBytes(params.getParam("_top", 'testTV1_IP', 0).getValue(), 5000, 'A6 01 00 00 00 05 01 44 0A 0A E7', null);
+
+var listener = ogscript.getObject("listener");
+if (listener != null)
+{
+   ogscript.debug("Message written to listener");
+   listener.writeAsBytes('A6 01 00 00 00 05 01 44 0A 0A E7');
+}
+else
+{
+   ogscript.debug("No listener connection found");
+}</task>
+         </button>
+      </tr>
+   </table>
+   <table height="213" left="226" top="865" width="1673">
+      <tr>
+         <label colspan="3" fill="both" header="true" name="Helper Scripts/Functions"/>
+      </tr>
+      <tr>
+         <param colspan="1" expand="true" fill="both" oid="IntegerToConvert" rowspan="1" weightx="1.0" weighty="1.0"/>
+         <button buttontype="push" colspan="1" fill="both" name="Convert To Hex:" rowspan="1" weightx="1.0" weighty="1.0">
+            <task tasktype="ogscript">var integerValue = params.getValue('IntegerToConvert', 0);
+var hexValue = parseInt(integerValue, 10).toString(16).toUpperCase();
+if(hexValue.length &lt; 2) {
+        hexValue = '0' + hexValue;
+    }
+ogscript.rename("output", hexValue);
+var convertedInteger = parseInt(hexValue, 16).toString(10);
+ogscript.debug('Converted back to Int: ' + convertedInteger);</task>
+         </button>
+         <label colspan="1" fill="both" id="output" name="Output:" rowspan="1" style="txt-align:east" weightx="1.0" weighty="1.0"/>
+      </tr>
+      <tr>
+         <param colspan="1" expand="true" fill="both" oid="HexToConvert" rowspan="1" weightx="1.0" weighty="1.0"/>
+         <button buttontype="push" colspan="1" fill="both" name="Convert To Int:" rowspan="1" weightx="1.0" weighty="1.0">
+            <task tasktype="ogscript">var hexValue = params.getValue('HexToConvert', 0);
+        var convertedInteger = parseInt(hexValue, 16).toString(10);
+         ogscript.rename("output2", convertedInteger);</task>
+         </button>
+         <label colspan="1" fill="both" id="output2" name="Output:" rowspan="1" style="txt-align:east;" weightx="1.0" weighty="1.0"/>
+      </tr>
+      <tr>
+         <label colspan="1" fill="both" name="IP of TV:" rowspan="1" style="txt-align:east" weightx="1.0" weighty="1.0"/>
+         <param colspan="2" expand="true" fill="both" oid="testTV1_IP" rowspan="1" weightx="1.0" weighty="1.0" widget="3"/>
+      </tr>
+   </table>
+   <param bottom="392" expand="true" left="2190" oid="tv1.volume" right="401" showlabel="false" style="look:flat;" top="248" widget="slider-vertical">
+      <task tasktype="ogscript">/*! block id=1000,1001,1002 !*/
+setVolume(params.getValue('tv1.volume', 0), params.getValue('testTV1_IP', 0))
+/*!!
+ &lt;block id="1000" type="function_setVolume" x="741" y="231" w="242" volumeLevel="ID:1001" tvIPAddress="ID:1002" /&gt;
+&lt;block id="1001" type="param__top&amp;amp;tv1.volume (tv1.volume)[0]" x="306" y="240" w="242" SET="" /&gt;
+&lt;block id="1002" type="param__top&amp;amp;testTV1_IP (testTV1_IP)[0]" x="323" y="332" w="242" SET="" /&gt;
+!!*/
+/*!!&lt;checksum&gt;bc4c70974b1953f97d152066a26efb5f&lt;/checksum&gt;!!*/</task>
+   </param>
+   <param expand="true" height="1239" left="2388" oid="tv1.volume" showlabel="false" top="258" widget="level-meter" width="45"/>
+   
+   <param expand="true" height="80" left="278" oid="messageToLog" top="1396" width="824"/>
+   <button buttontype="push" height="79" left="1132" name="Send to Log File" top="1396" width="488">
+      <task tasktype="ogscript">/*! block id=1002,1001 !*/
+ogscript.debug(params.getValue('messageToLog', 0));
+/*!!
+ &lt;block id="1002" type="ogscript_debug" x="692" y="257" w="242" MESSAGE="ID:1001" /&gt;
+&lt;block id="1001" type="param__top&amp;amp;messageToLog (messageToLog)[0]" x="231" y="239" w="242" SET="" /&gt;
+!!*/
+/*!!&lt;checksum&gt;1de2f3f863ab9a150d7cc0d9bd105033&lt;/checksum&gt;!!*/</task>
+      <task tasktype="ogscript">logFile.write(params.getValue('messageToLog', 0));</task>
+   </button>
+   <button buttontype="push" height="70" left="1632" name="Clear file." top="1402" width="328">
+      <task tasktype="ogscript">logFile.clear();</task>
+   </button>
+   <button buttontype="push" height="79" left="170" name="Reload Panel" top="35" width="524">
+      <task tasktype="ogscript"/>
+      <task tasktype="ogscript">/*! block id=1000 !*/
+ogscript.reload("_top");
+/*!!
+ &lt;block id="1000" type="ogscript_reload" x="981" y="313" w="241" ID="_top" /&gt;
+!!*/
+/*!!&lt;checksum&gt;1d429afb92dad66b9152baaa437fe09a&lt;/checksum&gt;!!*/</task>
+   </button>
+<table height="1243" left="2450" top="254" width="130">
+      <tr>
+         <button buttontype="push" colspan="1" fill="both" name="Vol UP" rowspan="1" weightx="1.0" weighty="1.0">
+            <task tasktype="ogscript">
+
+
+/*! block id=1001 !*/
+params.setValue('tv1.volume', 0, params.getValue('tv1.volume', 0) + 1);
+/*!!
+ &lt;block id="1001" type="math_increment_param" x="119" y="174" w="267" PARAM="[root, Params for PlanarTVviaListener_v6.grid, Not In Menu, tv1.volume (tv1.volume)]" VALUE="1" /&gt;
+!!*/
+/*!!&lt;checksum&gt;f20cfb28f09baabb605a9e5890b5752e&lt;/checksum&gt;!!*/</task>
+         </button>
+      </tr>
+      <tr>
+         <button buttontype="push" colspan="1" fill="both" name="Vol Down" rowspan="1" weightx="1.0" weighty="1.0">
+            <task tasktype="ogscript">
+
+
+/*! block id=1002 !*/
+params.setValue('tv1.volume', 0, params.getValue('tv1.volume', 0) + -1);
+/*!!
+ &lt;block id="1002" type="math_increment_param" x="281" y="216" w="267" PARAM="[root, Params for PlanarTVviaListener_v6.grid, Not In Menu, tv1.volume (tv1.volume)]" VALUE="-1" /&gt;
+!!*/
+/*!!&lt;checksum&gt;5d4301bda89d829df62840e38e894e7c&lt;/checksum&gt;!!*/</task>
+         </button>
+      </tr>
+   </table>
+</abs>
