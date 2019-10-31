@@ -30,7 +30,7 @@ function setVolume(volumeLevel, tvIPAddress, listener) {
   var setVolumeCommand = "A6 01 00 00 00 05 01 44 " + hexVolume + " " + hexVolume;
   // ogscript.debug("Volume in hex: " + hexVolume);
   // ogscript.debug("Command to send before checksum: " + setVolumeCommand);
-  var checksum = LRC(setVolumeCommand.replace(/\s/g, "")).toUpperCase();
+  var checksum = tv.getChecksum(setVolumeCommand.replace(/\s/g, "")).toUpperCase();
   // ogscript.debug("Checksum: " + checksum);
   var setVolumeCommand = setVolumeCommand + " " + checksum;
   // ogscript.debug("Final command to send to tv: " + setVolumeCommand);
