@@ -1,10 +1,11 @@
 /**
- * This file deals with listener conversions to/from hex
- * @param  {[type]} integerValue [description]
- * @return {[type]}              [description]
+ * This function converts various hex/byte/strings.
+ * convert.toHex(integerValue) @returns hexValue.
+ * convert.toInteger(hexValue) @returns integer.
+ * convert.toHexString(byteArray) @returns hex string.
+ * convert.toByteArray(hexString) @returns byte array.
  */
-
- var convert = (function() {
+var convert = (function() {
 
    // This function takes an integer and creates a 2 character Byte
    function toHex(integerValue) {
