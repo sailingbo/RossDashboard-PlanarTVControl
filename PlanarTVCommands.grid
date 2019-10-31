@@ -11,8 +11,8 @@
          <param access="1" maxlength="0" name="IntegerToConvert" oid="IntegerToConvert" type="STRING" value="63" widget="text"/>
          <param access="1" maxlength="0" name="Converted Into Hex:" oid="Converted_Into_Hex" type="STRING" value="" widget="label"/>
          <param access="1" maxlength="0" name="HexToConvert" oid="HexToConvert" type="STRING" value="63" widget="text"/>
-         <param access="1" constraint="0.0;100.0;0.0;100.0;1" constrainttype="INT_STEP_RANGE" name="tv1.volume" oid="tv1.volume" precision="0" type="INT16" value="19" widget="slider-vertical"/>
-         <param access="1" constrainttype="INT_NULL" name="tv1.volumeAfterMute" oid="tv1.volumeAfterMute" precision="0" type="INT16" value="19" widget="default"/>
+         <param access="1" constraint="0.0;100.0;0.0;100.0;1" constrainttype="INT_STEP_RANGE" name="tv1.volume" oid="tv1.volume" precision="0" type="INT16" value="13" widget="slider-vertical"/>
+         <param access="1" constrainttype="INT_NULL" name="tv1.volumeAfterMute" oid="tv1.volumeAfterMute" precision="0" type="INT16" value="13" widget="default"/>
          <param access="1" maxlength="0" name="messageToLog" oid="messageToLog" type="STRING" value="And more." widget="text"/>
          <param access="1" maxlength="0" name="TV1_IP" oid="TV1_IP" type="STRING" value="192.168.100.228" widget="default"/>
          <param access="1" maxlength="0" name="TV2_IP" oid="TV2_IP" type="STRING" value="192.168.100.229" widget="default"/>
@@ -27,9 +27,26 @@
             <constraint key="1">MUTE ON</constraint>
          </param>
       </params>
-      <api id="conversions" immediate="true" name="conversions" src="./scripts/conversions.js"/>
-      <api id="logFile" immediate="true" name="logFile" src="./scripts/logfile.js"/>
-      <api id="PlanarTVScripts" immediate="true" name="PlanarTVScripts" src="./scripts/PlanarTVScripts.grid.js"/>
+      <api>// This is the Ross Callback Function
+        function callback(success, sentData, resultString, exception) {
+          ogscript.debug("Success: " + success);
+          ogscript.debug("Sent Data: " + sentData);
+          ogscript.debug("Result String: " + resultString);
+          ogscript.debug("Exception: " + exception);
+          if (!success) {
+            ogscript.debug("Unable to send message: " + exception);
+          } else {
+            // ogscript.debug("Result String via Callback: " + resultString);
+            var hexString = convert.toHexString(resultString);
+            var percentageVolume = resultString[8].toString(10);
+            // ogscript.debug("Resulting Hex String: " + hexString);
+            // ogscript.debug("Volume Percentage: " + percentageVolume + "%");
+            return resultString;
+          }
+        }</api>
+      <api id="conversions" name="conversions" src="./scripts/conversions.js"/>
+      <api id="logFile" name="logFile" src="./scripts/logfile.js"/>
+      <api id="PlanarTVScripts" name="PlanarTVScripts" src="./scripts/PlanarTVScripts.grid.js"/>
       <!-- This is the listener that should hear the response from the TV over port 5000. -->
       <listener autostart="true" connecthost="%const['hosts']['TV1.host']%" connectport="%const['hosts']['TV1.port']%" delimiter="9" delimitertype="fixedlen" id="planarListener_tv1" name="planarListener_tv1" syncword="21">
          <task tasktype="ogscript">if (event.isConnectEvent())
@@ -124,12 +141,12 @@ else if (event.isDisconnectEvent())
       </tr>
       <tr>
          <button buttontype="push" colspan="3" fill="both" name="Get Volume" rowspan="1" weightx="1.0" weighty="1.0">
-            <task tasktype="ogscript">getVolume(params.getParam("_top", 'TV1_IP', 0).getValue(), 'listener_tv1');</task>
+            <task tasktype="ogscript">tv.getVolume(params.getParam("_top", 'TV1_IP', 0).getValue(), 'listener_tv1');</task>
          </button>
       </tr>
       <tr>
          <param bottom="392" colspan="1" expand="true" fill="both" left="2190" oid="tv1.volume" right="401" rowspan="2" showlabel="false" style="look:flat;" top="248" weightx=".5" weighty="1.0" widget="slider-vertical">
-            <task tasktype="ogscript">setVolume(params.getValue('tv1.volume', 0), params.getValue('testTV1_IP', 0), 'listener_tv1')</task>
+            <task tasktype="ogscript">tv.setVolume(params.getValue('tv1.volume', 0), params.getValue('testTV1_IP', 0), 'listener_tv1')</task>
          </param>
          <param colspan="1" expand="true" fill="both" left="2388" oid="tv1.volume" rowspan="2" showlabel="false" top="258" weightx="1.0" weighty="1.0" widget="level-meter" width="50"/>
          <button buttontype="push" colspan="1" fill="both" name="Vol UP" rowspan="1" weightx=".5" weighty="1.0">
@@ -207,7 +224,7 @@ else
       </tr>
       <tr>
          <param bottom="392" colspan="1" expand="true" fill="both" left="2190" oid="tv2.volume" right="401" rowspan="2" showlabel="false" style="look:flat;" top="248" weightx=".5" weighty="1.0">
-            <task tasktype="ogscript">setVolume(params.getValue('tv2.volume', 0), params.getValue('TV2_IP', 0), 'listener_tv2');</task>
+            <task tasktype="ogscript">tv.setVolume(params.getValue('tv2.volume', 0), params.getValue('TV2_IP', 0), 'listener_tv2');</task>
          </param>
          <param colspan="1" expand="true" fill="both" left="2388" oid="tv2.volume" rowspan="2" showlabel="false" top="258" weightx="1.0" weighty="1.0" widget="level-meter" width="50"/>
          <button buttontype="push" colspan="1" fill="both" name="Vol UP" rowspan="1" weightx=".5" weighty="1.0">
@@ -226,5 +243,4 @@ else
          </param>
       </tr>
    </table>
-   
 </abs>
