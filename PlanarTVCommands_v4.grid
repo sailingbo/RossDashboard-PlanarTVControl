@@ -11,12 +11,12 @@
          <param access="1" maxlength="0" name="IntegerToConvert" oid="IntegerToConvert" type="STRING" value="63" widget="text"/>
          <param access="1" maxlength="0" name="Converted Into Hex:" oid="Converted_Into_Hex" type="STRING" value="" widget="label"/>
          <param access="1" maxlength="0" name="HexToConvert" oid="HexToConvert" type="STRING" value="63" widget="text"/>
-         <param access="1" constraint="0.0;100.0;0.0;100.0;1" constrainttype="INT_STEP_RANGE" name="tv1.volume" oid="tv1.volume" precision="0" type="INT16" value="0" widget="slider-vertical"/>
-         <param access="1" constrainttype="INT_NULL" name="tv1.volumeAfterMute" oid="tv1.volumeAfterMute" precision="0" type="INT16" value="8" widget="default"/>
+         <param access="1" constraint="0.0;100.0;0.0;100.0;1" constrainttype="INT_STEP_RANGE" name="tv1.volume" oid="tv1.volume" precision="0" type="INT16" value="23" widget="slider-vertical"/>
+         <param access="1" constrainttype="INT_NULL" name="tv1.volumeAfterMute" oid="tv1.volumeAfterMute" precision="0" type="INT16" value="23" widget="default"/>
          <param access="1" maxlength="0" name="messageToLog" oid="messageToLog" type="STRING" value="And more." widget="text"/>
          <param access="1" maxlength="0" name="TV1_IP" oid="TV1_IP" type="STRING" value="192.168.100.228" widget="default"/>
          <param access="1" maxlength="0" name="TV2_IP" oid="TV2_IP" type="STRING" value="192.168.100.229" widget="default"/>
-         <param access="1" constraint="0.0;100.0;0.0;100.0;1" constrainttype="INT_STEP_RANGE" name="tv2.volume" oid="tv2.volume" precision="0" type="INT16" value="1" widget="slider-vertical"/>
+         <param access="1" constraint="0.0;100.0;0.0;100.0;1" constrainttype="INT_STEP_RANGE" name="tv2.volume" oid="tv2.volume" precision="0" type="INT16" value="0" widget="slider-vertical"/>
          <param access="1" constrainttype="INT_NULL" name="tv2.volumeAfterMute" oid="tv2.volumeAfterMute" precision="0" type="INT16" value="10" widget="default"/>
          <param access="1" constraintstrict="false" constrainttype="STRING_STRING_CHOICE" maxlength="0" name="TV 1 Mute" oid="TV1_MUTE" type="STRING" value="0" widget="default">
             <constraint key="0">MUTE OFF</constraint>
@@ -118,11 +118,6 @@ else if (event.isDisconnectEvent())
          </button>
       </tr>
       <tr>
-         <button buttontype="push" colspan="3" fill="both" id="power.off" name="Power Off" style="bg#FF0000;font:bold;size:Normal;">
-            <task tasktype="ogscript">rosstalk.sendAsBytes("192.168.100.228", 5000, "A6 01 00 00 00 04 01 18 01 BB", null);</task>
-         </button>
-      </tr>
-      <tr>
          <button buttontype="push" colspan="3" fill="both" name="Get Volume" rowspan="1" weightx="1.0" weighty="1.0">
             <task tasktype="ogscript">getVolume(params.getParam("_top", 'TV1_IP', 0).getValue(), 'listener_tv1');</task>
          </button>
@@ -133,8 +128,16 @@ else if (event.isDisconnectEvent())
          </param>
          <param colspan="1" expand="true" fill="both" left="2388" oid="tv1.volume" rowspan="2" showlabel="false" top="258" weightx="1.0" weighty="1.0" widget="level-meter" width="50"/>
          <button buttontype="push" colspan="1" fill="both" name="Vol UP" rowspan="1" weightx=".5" weighty="1.0">
-            <task tasktype="ogscript">params.setValue('tv1.volume', 0, params.getValue('tv1.volume', 0) + 1);</task>
             <task tasktype="ogscript"/>
+            <task tasktype="ogscript">
+
+
+/*! block id=1008 !*/
+params.setValue('tv1.volume', 0, params.getValue('tv1.volume', 0) + 1);
+/*!!
+ &lt;block id="1008" type="math_increment_param" x="430" y="257" w="267" PARAM="[root, Params for PlanarTVCommands_v4.grid, Not In Menu, tv1.volume (tv1.volume)]" VALUE="1" /&gt;
+!!*/
+/*!!&lt;checksum&gt;eace898644f17e262bfb1e7f367295d3&lt;/checksum&gt;!!*/</task>
          </button>
       </tr>
       <tr>
@@ -148,15 +151,16 @@ params.setValue('tv1.volume', 0, params.getValue('tv1.volume', 0) + -1);
          </button>
       </tr>
       <tr>
-         <param colspan="3" expand="true" fill="both" oid="TV1_MUTE" showlabel="false" style="style:toggleButton;t:bg#FF1111;" widget="toggle">
+         <param colspan="3" expand="true" fill="both" gpi="MUTE_TV1" oid="TV1_MUTE" showlabel="false" style="style:toggleButton;t:bg#FF1111;" widget="toggle">
+            <task tasktype="ogscript"/>
             <task tasktype="ogscript">if (params.getValue('TV1_MUTE', 0)  ==  0)
 {
-	params.setValue('tv1.volume', 0, params.getValue('tv1.volumeAfterMute', 0));
+   params.setValue('tv1.volume', 0, params.getValue('tv1.volumeAfterMute', 0));
    ogscript.debug('Mute is off.  Reset to Volume After Mute.');
 } else {
    params.setValue('tv1.volumeAfterMute', 0, params.getValue('tv1.volume', 0));
    ogscript.debug('Mute is on. Set volume to zero.');
-	params.setValue('tv1.volume', 0, 0);
+   params.setValue('tv1.volume', 0, 0);
 }</task>
          </param>
       </tr>
@@ -220,4 +224,5 @@ else
          </param>
       </tr>
    </table>
+   
 </abs>
