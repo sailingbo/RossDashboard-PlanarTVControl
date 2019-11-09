@@ -92,6 +92,32 @@ function getChecksum(hexstring) {
   }
 }
 
+
+// This function decides whether to actually send the value yet.
+function readyToSend() {
+  // if command was sent very recently, return false, flag to updateTVAgain and store command in array
+  if (ogscript.getObject('lastCommandSentTime')) {
+    ogscript.debug('lastCommandSentTime: ' + ogscript.getObject('lastCommandSentTime'));
+    ogscript.debug(new Date() - ogscript.getObject('lastCommandSentTime'));
+    if ((new Date() - ogscript.getObject('lastCommandSentTime')) < 1500) {
+      ogscript.putObject('updateTVAgain', true);
+      ogscript.debug('3');
+      return false;
+    }
+    // if command wasn't sent recently, return true and update lastCommandSentTime
+    else {
+      ogscript.putObject('lastCommandSentTime', new Date());
+      ogscript.debug('2');
+      return true;
+    }
+  }
+  else {
+    ogscript.putObject('lastCommandSentTime', new Date());
+    ogscript.debug('1');
+    return true;
+  }
+}
+
 return {
   getVolume: getVolume,
   setVolume: setVolume,
@@ -99,6 +125,7 @@ return {
   turnOn: turnOn,
   turnOff: turnOff,
   sendToTV: sendToTV,
-  getChecksum: getChecksum
+  getChecksum: getChecksum,
+  readyToSend: readyToSend
 }
 }());
