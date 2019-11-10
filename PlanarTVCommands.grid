@@ -11,14 +11,14 @@
          <param access="1" maxlength="0" name="IntegerToConvert" oid="IntegerToConvert" type="STRING" value="63" widget="text"/>
          <param access="1" maxlength="0" name="Converted Into Hex:" oid="Converted_Into_Hex" type="STRING" value="" widget="label"/>
          <param access="1" maxlength="0" name="HexToConvert" oid="HexToConvert" type="STRING" value="63" widget="text"/>
-         <param access="1" constraint="0.0;100.0;0.0;100.0;1" constrainttype="INT_STEP_RANGE" name="tv1.volume" oid="tv1.volume" precision="0" type="INT16" value="13" widget="slider-vertical"/>
-         <param access="1" constrainttype="INT_NULL" name="tv1.volumeAfterMute" oid="tv1.volumeAfterMute" precision="0" type="INT16" value="13" widget="default"/>
+         <param access="1" constraint="0.0;100.0;0.0;100.0;1" constrainttype="INT_STEP_RANGE" name="tv1.volume" oid="tv1.volume" precision="0" type="INT16" value="73" widget="slider-vertical"/>
+         <param access="1" constrainttype="INT_NULL" name="tv1.volumeAfterMute" oid="tv1.volumeAfterMute" precision="0" type="INT16" value="39" widget="default"/>
          <param access="1" maxlength="0" name="messageToLog" oid="messageToLog" type="STRING" value="And more." widget="text"/>
          <param access="1" maxlength="0" name="TV1_IP" oid="TV1_IP" type="STRING" value="192.168.100.228" widget="default"/>
          <param access="1" maxlength="0" name="TV2_IP" oid="TV2_IP" type="STRING" value="192.168.100.229" widget="default"/>
          <param access="1" constraint="0.0;100.0;0.0;100.0;1" constrainttype="INT_STEP_RANGE" name="tv2.volume" oid="tv2.volume" precision="0" type="INT16" value="0" widget="slider-vertical"/>
          <param access="1" constrainttype="INT_NULL" name="tv2.volumeAfterMute" oid="tv2.volumeAfterMute" precision="0" type="INT16" value="10" widget="default"/>
-         <param access="1" constraintstrict="false" constrainttype="STRING_STRING_CHOICE" maxlength="0" name="TV 1 Mute" oid="TV1_MUTE" type="STRING" value="0" widget="default">
+         <param access="1" constraintstrict="false" constrainttype="STRING_STRING_CHOICE" maxlength="0" name="TV 1 Mute" oid="TV1_MUTE" type="STRING" value="0.0" widget="default">
             <constraint key="0">MUTE OFF</constraint>
             <constraint key="1">MUTE ON</constraint>
          </param>
@@ -26,24 +26,15 @@
             <constraint key="0">MUTE OFF</constraint>
             <constraint key="1">MUTE ON</constraint>
          </param>
+         <param access="1" constrainttype="STRING_CHOICE" maxlength="0" name="muteEnable_tv1" oid="muteEnable_tv1" type="STRING" value="1.0" widget="combo">
+            <constraint>0</constraint>
+            <constraint>1</constraint>
+         </param>
+         <param access="1" constrainttype="STRING_CHOICE" maxlength="0" name="muteEnable_tv2" oid="muteEnable_tv2" type="STRING" value="1" widget="combo">
+            <constraint>0</constraint>
+            <constraint>1</constraint>
+         </param>
       </params>
-      <api>// This is the Ross Callback Function
-        function callback(success, sentData, resultString, exception) {
-          ogscript.debug("Success: " + success);
-          ogscript.debug("Sent Data: " + sentData);
-          ogscript.debug("Result String: " + resultString);
-          ogscript.debug("Exception: " + exception);
-          if (!success) {
-            ogscript.debug("Unable to send message: " + exception);
-          } else {
-            // ogscript.debug("Result String via Callback: " + resultString);
-            var hexString = convert.toHexString(resultString);
-            var percentageVolume = resultString[8].toString(10);
-            // ogscript.debug("Resulting Hex String: " + hexString);
-            // ogscript.debug("Volume Percentage: " + percentageVolume + "%");
-            return resultString;
-          }
-        }</api>
       <api id="conversions" name="conversions" src="./scripts/conversions.js"/>
       <api id="logFile" name="logFile" src="./scripts/logfile.js"/>
       <api id="PlanarTVScripts" name="PlanarTVScripts" src="./scripts/PlanarTVScripts.grid.js"/>
@@ -141,22 +132,26 @@ else if (event.isDisconnectEvent())
       </tr>
       <tr>
          <button buttontype="push" colspan="3" fill="both" name="Get Volume" rowspan="1" weightx="1.0" weighty="1.0">
-            <task tasktype="ogscript">tv.getVolume(params.getParam("_top", 'TV1_IP', 0).getValue(), 'listener_tv1');</task>
+            <task tasktype="ogscript">tv.getVolume(params.getParam("_top", 'TV1_IP', 0).getValue(), 'listener_tv1');
+   ogscript.debug('Pushed.');</task>
          </button>
       </tr>
       <tr>
          <param bottom="392" colspan="1" expand="true" fill="both" left="2190" oid="tv1.volume" right="401" rowspan="2" showlabel="false" style="look:flat;" top="248" weightx=".5" weighty="1.0" widget="slider-vertical">
-            <task tasktype="ogscript">tv.setVolume(params.getValue('tv1.volume', 0), params.getValue('testTV1_IP', 0), 'listener_tv1')</task>
+            <task tasktype="ogscript">tv.setVolume(params.getValue('tv1.volume', 0), params.getValue('testTV1_IP', 0), 'listener_tv1');</task>
          </param>
          <param colspan="1" expand="true" fill="both" left="2388" oid="tv1.volume" rowspan="2" showlabel="false" top="258" weightx="1.0" weighty="1.0" widget="level-meter" width="50"/>
          <button buttontype="push" colspan="1" fill="both" name="Vol UP" rowspan="1" weightx=".5" weighty="1.0">
-            <task tasktype="ogscript"/>
-            <task tasktype="ogscript">/*! block id=1008 !*/
-params.setValue('tv1.volume', 0, params.getValue('tv1.volume', 0) + 1);
-/*!!
- &lt;block id="1008" type="math_increment_param" x="430" y="257" w="267" PARAM="[root, Params for PlanarTVCommands_v4.grid, Not In Menu, tv1.volume (tv1.volume)]" VALUE="1" /&gt;
-!!*/
-/*!!&lt;checksum&gt;eace898644f17e262bfb1e7f367295d3&lt;/checksum&gt;!!*/</task>
+            <task tasktype="ogscript">if (params.getValue('TV1_MUTE', 0) == 1) {
+   params.setValue('muteEnable_tv1', 0, 0);
+   params.setValue('TV1_MUTE', 0, 0);
+   ogscript.debug('Mute button disabled and set to off.');
+   params.setValue('tv1.volume', 0, params.getValue('tv1.volume', 0) + 1);
+   params.setValue('muteEnable_tv1', 0, 1);
+}
+else {
+   params.setValue('tv1.volume', 0, params.getValue('tv1.volume', 0) + 1);
+}</task>
          </button>
       </tr>
       <tr>
@@ -171,16 +166,17 @@ params.setValue('tv1.volume', 0, params.getValue('tv1.volume', 0) + -1);
       </tr>
       <tr>
          <param colspan="3" expand="true" fill="both" gpi="MUTE_TV1" oid="TV1_MUTE" showlabel="false" style="style:toggleButton;t:bg#FF1111;" widget="toggle">
-            <task tasktype="ogscript"/>
-            <task tasktype="ogscript">if (params.getValue('TV1_MUTE', 0)  ==  0)
-{
-   params.setValue('tv1.volume', 0, params.getValue('tv1.volumeAfterMute', 0));
-   ogscript.debug('Mute is off.  Reset to Volume After Mute.');
-} else {
-   params.setValue('tv1.volumeAfterMute', 0, params.getValue('tv1.volume', 0));
-   ogscript.debug('Mute is on. Set volume to zero.');
-   params.setValue('tv1.volume', 0, 0);
-}</task>
+            <task tasktype="ogscript">if (params.getValue('muteEnable_tv1', 0) == 1) {
+   if (params.getValue('TV1_MUTE', 0)  ==  0)
+   {
+      params.setValue('tv1.volume', 0, params.getValue('tv1.volumeAfterMute', 0));
+      ogscript.debug('Mute is off.  Reset to ' + params.getValue('tv1.volumeAfterMute', 0) + '%');
+   } else {
+      params.setValue('tv1.volumeAfterMute', 0, params.getValue('tv1.volume', 0));
+      ogscript.debug('Mute is on. Set volume to zero.');
+      params.setValue('tv1.volume', 0, 0);
+   }
+ }</task>
          </param>
       </tr>
       <tr>
@@ -188,58 +184,6 @@ params.setValue('tv1.volume', 0, params.getValue('tv1.volume', 0) + -1);
          <param colspan="2" expand="true" fill="both" oid="TV1_IP" rowspan="1" weightx="1.0" weighty=".25">
             <task tasktype="ogscript">/*! block id=1001,1000 !*/
 ogscript.putPrivateString("hosts", "TV1.host", params.getValue('TV1_IP', 0));</task>
-         </param>
-      </tr>
-   </table>
-   <table height="1174" left="928" top="47" width="657">
-      <tr>
-         <label anchor="center" colspan="3" fill="both" header="true" name="TV 2" weightx="1.0"/>
-      </tr>
-      <tr>
-         <button buttontype="push" colspan="3" fill="both" id="power.on" name="Power On" style="bg#timerfg;font:bold;size:Normal;">
-            <task tasktype="ogscript">rosstalk.sendAsBytes(params.getParam("_top", 'TV2_IP', 0).getValue(), 5000, "A6 01 00 00 00 04 01 18 02 B8", null);</task>
-         </button>
-      </tr>
-      <tr>
-         <button buttontype="push" colspan="3" fill="both" id="power.off" name="Power Off" style="bg#FF0000;font:bold;size:Normal;">
-            <task tasktype="ogscript">rosstalk.sendAsBytes(params.getParam("_top", 'TV2_IP', 0).getValue(), 5000, "A6 01 00 00 00 04 01 18 01 BB", null);</task>
-         </button>
-      </tr>
-      <tr>
-         <button buttontype="push" colspan="3" fill="both" name="Get Volume" rowspan="1" weightx="1.0" weighty="1.0">
-            <task tasktype="ogscript">ogscript.debug("Get Volume Button Pushed.");
-  // rosstalk.sendAsBytesWithResponse(params.getParam("_top", 'TV2_IP', 0).getValue(), 5000, 'A6 01 00 00 00 03 01 45 E0', '61', callback);
-
-var listener = ogscript.getObject("listener_tv2");
-if (listener != null)
-{
-   // ogscript.debug("Message written to listener 2");
-   listener.writeAsBytes('A6 01 00 00 00 03 01 45 E0');
-}
-else
-{
-   ogscript.debug("Listener 2 connection not found");
-}</task>
-         </button>
-      </tr>
-      <tr>
-         <param bottom="392" colspan="1" expand="true" fill="both" left="2190" oid="tv2.volume" right="401" rowspan="2" showlabel="false" style="look:flat;" top="248" weightx=".5" weighty="1.0">
-            <task tasktype="ogscript">tv.setVolume(params.getValue('tv2.volume', 0), params.getValue('TV2_IP', 0), 'listener_tv2');</task>
-         </param>
-         <param colspan="1" expand="true" fill="both" left="2388" oid="tv2.volume" rowspan="2" showlabel="false" top="258" weightx="1.0" weighty="1.0" widget="level-meter" width="50"/>
-         <button buttontype="push" colspan="1" fill="both" name="Vol UP" rowspan="1" weightx=".5" weighty="1.0">
-            <task tasktype="ogscript">params.setValue('tv2.volume', 0, params.getValue('tv2.volume', 0) + 1);</task>
-         </button>
-      </tr>
-      <tr>
-         <button buttontype="push" colspan="1" fill="both" name="Vol Down" rowspan="1" weightx="1.0" weighty="1.0">
-            <task tasktype="ogscript">params.setValue('tv2.volume', 0, params.getValue('tv2.volume', 0) + -1);</task>
-         </button>
-      </tr>
-      <tr>
-         <label fill="both" header="true" name="TV 2 IP Address"/>
-         <param colspan="2" expand="true" fill="both" oid="TV2_IP" rowspan="1" weightx="1.0" weighty=".25">
-            <task tasktype="ogscript">ogscript.putPrivateString("hosts", "TV2.host", params.getValue('TV2_IP', 0));</task>
          </param>
       </tr>
    </table>

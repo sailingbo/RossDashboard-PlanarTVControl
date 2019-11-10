@@ -13,119 +13,163 @@
  * bocordle@sailingbo.com 10/31/2019
  */
 
-var tv = (function() {
-
-// This function gets the current TV volume.
-function getVolume(tvIPAddress, listener) {
-  logFile.write("Get Volume Button Pushed.");
-  var getVolumeCommand = "A6 01 00 00 00 03 01 45 E0";
-  // logFile.write("Final command to send to tv: " + setVolumeCommand);
-  // Send command to TV now.
-  sendToTV(getVolumeCommand, tvIPAddress, listener);
-}
-
-// This function takes a volume INT and converts it to a string to be sent to the TV
-function setVolume(volumeLevel, tvIPAddress, listener) {
-  hexVolume = convert.toHex(volumeLevel);
-  var setVolumeCommand = "A6 01 00 00 00 05 01 44 " + hexVolume + " " + hexVolume;
-  // ogscript.debug("Volume in hex: " + hexVolume);
-  // ogscript.debug("Command to send before checksum: " + setVolumeCommand);
-  var checksum = tv.getChecksum(setVolumeCommand.replace(/\s/g, "")).toUpperCase();
-  // ogscript.debug("Checksum: " + checksum);
-  var setVolumeCommand = setVolumeCommand + " " + checksum;
-  // ogscript.debug("Final command to send to tv: " + setVolumeCommand);
-  // logFile.write("Final command to send to tv: " + setVolumeCommand);
-  // Send command to TV now.
-  sendToTV(setVolumeCommand, tvIPAddress, listener);
-}
-
-// This function gets the power state of the TV
-function getPowerState(tvIPAddress, listener) {
-  var getPowerCommand = "A6 01 00 00 00 03 01 19 BC";
-  // Send command to TV now.
-  sendToTV(getPowerCommand, tvIPAddress, listener);
-}
-
-// This function turns on the TV
-function turnOn(tvIPAddress, listener) {
-  var setPowerCommand = "A6 01 00 00 00 04 01 18 02 BB";
-  // Send command to TV now.
-  sendToTV(setPowerCommand, tvIPAddress, listener);
-}
-
-// This function turns on the TV
-function turnOff(tvIPAddress, listener) {
-  var setPowerCommand = "A6 01 00 00 00 04 01 18 01 BB";
-  // Send command to TV now.
-  sendToTV(setPowerCommand, tvIPAddress, listener);
-}
-
-// This function sends a passed command to the TV.
-function sendToTV(command, tvIPAddress, listener) {
-  var listener = ogscript.getObject(listener);
-  if (listener != null){
-    logFile.write("Command sent to TV: " + command);
-    listener.writeAsBytes(command);
-  }
-  else {
-    logFile.write("No listener connection found. Try sendAsBytes?");
-    // rosstalk.sendAsBytes(tvIPAddress, 5000, command, callback);
-  }
-}
-
-// This function calculates the proper checksum (LRC) for Planar TVs
-function getChecksum(hexstring) {
-  if (hexstring != "") {
-    var s = hexstring.match(/../g);
-    var lrc = 0;
-    s.forEach(function(hexbyte) {
-      var n = 1 * ("0x" + hexbyte);
-      lrc ^= n;
-    });
-
-    lrc = lrc.toString(16);
-    if (lrc.length % 2)
-      lrc = "0" + lrc;
-    return lrc;
+// This is the Ross Callback Function
+function callback(success, sentData, resultString, exception) {
+  ogscript.debug("Success: " + success);
+  ogscript.debug("Sent Data: " + sentData);
+  ogscript.debug("Result String: " + resultString);
+  ogscript.debug("Exception: " + exception);
+  if (!success) {
+    ogscript.debug("Unable to send message: " + exception);
   } else {
-    ogscript.debug("Hexstring is null.");
+    // ogscript.debug("Result String via Callback: " + resultString);
+    var hexString = convert.toHexString(resultString);
+    var percentageVolume = resultString[8].toString(10);
+    // ogscript.debug("Resulting Hex String: " + hexString);
+    // ogscript.debug("Volume Percentage: " + percentageVolume + "%");
+    // if updateTVAgain is true, run the SetVolumeCommand again.
+    var updateTVAgain = getObject('updateTVAgain');
+    if (updateTVAgain.true) {
+      ogscript.debug('Running setVolume() again from Callback function.');
+      tv.setVolume(params.getValue('tv1.volume', 0), updateTVAgain.tvIPAddress, updateTVAgain.listener);
+    }
+    return resultString;
   }
 }
 
+var tv = (function() {
+  var command = {
+    getVolume: "A6 01 00 00 00 03 01 45 E0",
+    getPowerState: "A6 01 00 00 00 03 01 19 BC",
+    setVolume: "A6 01 00 00 00 05 01 44 ",
+    setPower: "A6 01 00 00 00 04 01 18 02 BB"
+  };
 
-// This function decides whether to actually send the value yet.
-function readyToSend() {
-  // if command was sent very recently, return false, flag to updateTVAgain and store command in array
-  if (ogscript.getObject('lastCommandSentTime')) {
-    ogscript.debug('lastCommandSentTime: ' + ogscript.getObject('lastCommandSentTime'));
-    ogscript.debug(new Date() - ogscript.getObject('lastCommandSentTime'));
-    if ((new Date() - ogscript.getObject('lastCommandSentTime')) < 1500) {
-      ogscript.putObject('updateTVAgain', true);
-      ogscript.debug('3');
-      return false;
+  // This function gets the current TV volume.
+  function getVolume(tvIPAddress, listener) {
+    logFile.write("Get Volume Button Pushed.");
+    ogscript.debug("Get Volume Button Pushed.");
+    // logFile.write("Final command to send to tv: " + setVolumeCommand);
+    // Send command to TV now.
+    sendToTV(command.getVolume, tvIPAddress, listener);
+  }
+
+  // This function takes a volume INT and converts it to a string to be sent to the TV
+  function setVolume(volumeLevel, tvIPAddress, listener) {
+    hexVolume = convert.toHex(volumeLevel);
+    var sendAgainAtEnd;
+    var setVolumeCommand = command.setVolume + hexVolume + " " + hexVolume;
+    // ogscript.debug("Volume in hex: " + hexVolume);
+    // ogscript.debug("Command to send before checksum: " + setVolumeCommand);
+    var checksum = tv.getChecksum(setVolumeCommand.replace(/\s/g, "")).toUpperCase();
+    // ogscript.debug("Checksum: " + checksum);
+    var setVolumeCommand = setVolumeCommand + " " + checksum;
+    // ogscript.debug("Final command to send to tv: " + setVolumeCommand);
+    logFile.write("Final command to send to tv: " + setVolumeCommand);
+    // Send command to TV now.
+    sendToTV(setVolumeCommand, tvIPAddress, listener);
+  }
+
+  // This function gets the power state of the TV
+  function getPowerState(tvIPAddress, listener) {
+    var getPowerCommand = "";
+    // Send command to TV now.
+    sendToTV(command.getPowerState, tvIPAddress, listener);
+  }
+
+  // This function turns on the TV
+  function turnOn(tvIPAddress, listener) {
+    // Send command to TV now.
+    sendToTV(command.setPower, tvIPAddress, listener);
+  }
+
+  // This function turns on the TV
+  function turnOff(tvIPAddress, listener) {
+    var setPowerCommand = "A6 01 00 00 00 04 01 18 01 BB";
+    // Send command to TV now.
+    sendToTV(setPowerCommand, tvIPAddress, listener);
+  }
+
+  // This function sends a passed command to the TV.
+  function sendToTV(command, tvIPAddress, listener) {
+    var listener = ogscript.getObject(listener);
+    // If readyToSend, send.
+    if (readyToSend()) {
+      if (listener != null) {
+        logFile.write("Command sent to TV: " + command);
+        listener.writeAsBytes(command);
+        ogscript.putObject("updateTVAgain.true", false);
+      } else {
+        logFile.write("No listener connection found. Try sendAsBytes?");
+        // rosstalk.sendAsBytes(tvIPAddress, 5000, command, callback);
+      }
+      ogscript.debug("Sent, theoretically.");
+      ogscript.putObject("lastCommandSentTime", new Date());
     }
-    // if command wasn't sent recently, return true and update lastCommandSentTime
+    // If not ready, flag updateTVAgain as true and die.
     else {
-      ogscript.putObject('lastCommandSentTime', new Date());
-      ogscript.debug('2');
+      var updateTVAgain = {
+        "true" : true,
+        "command" : command,
+        "tvIPAddress" : tvIPAddress,
+        "listener" : listener
+      }
+      ogscript.putObject("updateTVAgain", updateTVAgain);
+      ogscript.debug("Not sent. updateTVAgain flag set to True.");
+      ogscript.debug(updateTVAgain.true);
+    }
+  }
+
+  // This function calculates the proper checksum (LRC) for Planar TVs
+  function getChecksum(hexstring) {
+    if (hexstring != "") {
+      var s = hexstring.match(/../g);
+      var lrc = 0;
+      s.forEach(function(hexbyte) {
+        var n = 1 * ("0x" + hexbyte);
+        lrc ^= n;
+      });
+
+      lrc = lrc.toString(16);
+      if (lrc.length % 2) lrc = "0" + lrc;
+      return lrc;
+    } else {
+      ogscript.debug("Hexstring is null.");
+    }
+  }
+
+  // This function decides whether to actually send the value yet.
+  function readyToSend() {
+    // if command was sent very recently, return false, flag to updateTVAgain and store command in array
+    if (ogscript.getObject("lastCommandSentTime")) {
+      ogscript.debug(
+        "lastCommandSentTime: " + ogscript.getObject("lastCommandSentTime")
+      );
+      ogscript.debug(new Date() - ogscript.getObject("lastCommandSentTime"));
+      if (new Date() - ogscript.getObject("lastCommandSentTime") < 250) {
+        ogscript.debug("3");
+        return false;
+      }
+      // if command wasn't sent recently, return true and update lastCommandSentTime
+      else {
+        ogscript.debug("2");
+        return true;
+      }
+    } else {
+      ogscript.putObject("lastCommandSentTime", new Date());
+      ogscript.debug("1");
       return true;
     }
   }
-  else {
-    ogscript.putObject('lastCommandSentTime', new Date());
-    ogscript.debug('1');
-    return true;
-  }
-}
 
-return {
-  getVolume: getVolume,
-  setVolume: setVolume,
-  getPowerState: getPowerState,
-  turnOn: turnOn,
-  turnOff: turnOff,
-  sendToTV: sendToTV,
-  getChecksum: getChecksum,
-  readyToSend: readyToSend
-}
-}());
+  return {
+    getVolume: getVolume,
+    setVolume: setVolume,
+    getPowerState: getPowerState,
+    turnOn: turnOn,
+    turnOff: turnOff,
+    sendToTV: sendToTV,
+    getChecksum: getChecksum,
+    readyToSend: readyToSend
+  };
+})();
