@@ -11,7 +11,7 @@
          <param access="1" maxlength="0" name="IntegerToConvert" oid="IntegerToConvert" type="STRING" value="63" widget="text"/>
          <param access="1" maxlength="0" name="Converted Into Hex:" oid="Converted_Into_Hex" type="STRING" value="" widget="label"/>
          <param access="1" maxlength="0" name="HexToConvert" oid="HexToConvert" type="STRING" value="63" widget="text"/>
-         <param access="1" constraint="0.0;100.0;0.0;100.0;1" constrainttype="INT_STEP_RANGE" name="tv1.volume" oid="tv1.volume" precision="0" type="INT16" value="73" widget="slider-vertical"/>
+         <param access="1" constraint="0.0;100.0;0.0;100.0;1" constrainttype="INT_STEP_RANGE" name="tv1.volume" oid="tv1.volume" precision="0" type="INT16" value="79" widget="slider-vertical"/>
          <param access="1" constrainttype="INT_NULL" name="tv1.volumeAfterMute" oid="tv1.volumeAfterMute" precision="0" type="INT16" value="39" widget="default"/>
          <param access="1" maxlength="0" name="messageToLog" oid="messageToLog" type="STRING" value="And more." widget="text"/>
          <param access="1" maxlength="0" name="TV1_IP" oid="TV1_IP" type="STRING" value="192.168.100.228" widget="default"/>

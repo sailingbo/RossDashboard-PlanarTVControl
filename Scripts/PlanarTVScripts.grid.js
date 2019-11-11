@@ -38,11 +38,13 @@ function callback(success, sentData, resultString, exception) {
 }
 
 var tv = (function() {
+  //Serial commands for Planar Simplicity 4k Series tvs.
   var command = {
     getVolume: "A6 01 00 00 00 03 01 45 E0",
     getPowerState: "A6 01 00 00 00 03 01 19 BC",
     setVolume: "A6 01 00 00 00 05 01 44 ",
-    setPower: "A6 01 00 00 00 04 01 18 02 BB"
+    turnOff: "A6 01 00 00 00 04 01 18 01 BB",
+    turnOn: "A6 01 00 00 00 04 01 18 02 BB"
   };
 
   // This function gets the current TV volume.
@@ -61,7 +63,7 @@ var tv = (function() {
     var setVolumeCommand = command.setVolume + hexVolume + " " + hexVolume;
     // ogscript.debug("Volume in hex: " + hexVolume);
     // ogscript.debug("Command to send before checksum: " + setVolumeCommand);
-    var checksum = tv.getChecksum(setVolumeCommand.replace(/\s/g, "")).toUpperCase();
+    var checksum = getChecksum(setVolumeCommand.replace(/\s/g, "")).toUpperCase();
     // ogscript.debug("Checksum: " + checksum);
     var setVolumeCommand = setVolumeCommand + " " + checksum;
     // ogscript.debug("Final command to send to tv: " + setVolumeCommand);
@@ -80,14 +82,15 @@ var tv = (function() {
   // This function turns on the TV
   function turnOn(tvIPAddress, listener) {
     // Send command to TV now.
-    sendToTV(command.setPower, tvIPAddress, listener);
+    ogscript.debug('tv.turnOn() Running.');
+    sendToTV(command.turnOn, tvIPAddress, listener);
   }
 
   // This function turns on the TV
   function turnOff(tvIPAddress, listener) {
-    var setPowerCommand = "A6 01 00 00 00 04 01 18 01 BB";
+    ogscript.debug('tv.turnOff() Running.');
     // Send command to TV now.
-    sendToTV(setPowerCommand, tvIPAddress, listener);
+    sendToTV(command.turnOff, tvIPAddress, listener);
   }
 
   // This function sends a passed command to the TV.
@@ -169,7 +172,6 @@ var tv = (function() {
     turnOn: turnOn,
     turnOff: turnOff,
     sendToTV: sendToTV,
-    getChecksum: getChecksum,
-    readyToSend: readyToSend
+    getChecksum: getChecksum
   };
 })();
