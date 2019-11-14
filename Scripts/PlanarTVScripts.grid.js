@@ -22,17 +22,17 @@ function callback(success, sentData, resultString, exception) {
   if (!success) {
     ogscript.debug("Unable to send message: " + exception);
   } else {
-    // ogscript.debug("Result String via Callback: " + resultString);
+    ogscript.debug("Result String via Callback: " + resultString);
     var hexString = convert.toHexString(resultString);
     var percentageVolume = resultString[8].toString(10);
     // ogscript.debug("Resulting Hex String: " + hexString);
     // ogscript.debug("Volume Percentage: " + percentageVolume + "%");
     // if updateTVAgain is true, run the SetVolumeCommand again.
-    var updateTVAgain = ogscript.getObject('updateTVAgain');
-    if (updateTVAgain.true) {
-      ogscript.debug('Running setVolume() again from Callback function.');
-      tv.setVolume(params.getValue('tv1.volume', 0), updateTVAgain.tvId);
-    }
+    //var updateTVAgain = ogscript.getObject('updateTVAgain');
+    //if (updateTVAgain.true) {
+    //  ogscript.debug('Running setVolume() again from Callback function.');
+    //  tv.setVolume(params.getValue('tv1.volume', 0), updateTVAgain.tvId);
+    //}
     return resultString;
   }
 }
@@ -112,65 +112,67 @@ var tv = (function() {
     // If not ready, flag updateTVAgain as true and die.
     else {
       var updateTVAgain = {
-        "true" : true,
-        "command" : command,
-        "tvId" : tvId
-      };
-      ogscript.putObject("updateTVAgain", updateTVAgain);
-      ogscript.debug("Not sent. updateTVAgain flag set to True.");
-      ogscript.debug(updateTVAgain.true);
-    }
+          "tvNum" : tvId,
+          "true" : true,
+          "command" : command
+        };
+    ogscript.putObject("updateTVAgain", updateTVAgain);
+    ogscript.debug("Not sent. updateTVAgain flag set to True for TV #" + updateTVAgain.tvNum);
+    // ogscript.debug(updateTVAgain.true);
   }
+}
 
-  // This function calculates the proper checksum (LRC) for Planar TVs
-  function getChecksum(hexstring) {
-    if (hexstring != "") {
-      var s = hexstring.match(/../g);
-      var lrc = 0;
-      s.forEach(function(hexbyte) {
-        var n = 1 * ("0x" + hexbyte);
-        lrc ^= n;
-      });
+// This function calculates the proper checksum (LRC) for Planar TVs
+function getChecksum(hexstring) {
+  if (hexstring != "") {
+    var s = hexstring.match(/../g);
+    var lrc = 0;
+    s.forEach(function(hexbyte) {
+      var n = 1 * ("0x" + hexbyte);
+      lrc ^= n;
+    });
 
-      lrc = lrc.toString(16);
-      if (lrc.length % 2) { lrc = "0" + lrc; }
-      return lrc;
-    } else {
-      ogscript.debug("Hexstring is null.");
+    lrc = lrc.toString(16);
+    if (lrc.length % 2) {
+      lrc = "0" + lrc;
     }
+    return lrc;
+  } else {
+    ogscript.debug("Hexstring is null.");
   }
+}
 
-  // This function decides whether to actually send the value yet.
-  function readyToSend() {
-    // if command was sent very recently, return false, flag to updateTVAgain and store command in array
-    if (ogscript.getObject("lastCommandSentTime")) {
-      ogscript.debug(
-        "lastCommandSentTime: " + ogscript.getObject("lastCommandSentTime")
-      );
-      ogscript.debug(new Date() - ogscript.getObject("lastCommandSentTime"));
-      if (new Date() - ogscript.getObject("lastCommandSentTime") < 250) {
-        // ogscript.debug("3");
-        return false;
-      }
-      // if command wasn't sent recently, return true and update lastCommandSentTime
-      else {
-        // ogscript.debug("2");
-        return true;
-      }
-    } else {
-      ogscript.putObject("lastCommandSentTime", new Date());
-      // ogscript.debug("1");
+// This function decides whether to actually send the value yet.
+function readyToSend() {
+  // if command was sent very recently, return false, flag to updateTVAgain and store command in array
+  if (ogscript.getObject("lastCommandSentTime")) {
+    // ogscript.debug(
+    //   "lastCommandSentTime: " + ogscript.getObject("lastCommandSentTime")
+    // );
+    // ogscript.debug(new Date() - ogscript.getObject("lastCommandSentTime"));
+    if (new Date() - ogscript.getObject("lastCommandSentTime") < 250) {
+      // ogscript.debug("3");
+      return false;
+    }
+    // if command wasn't sent recently, return true and update lastCommandSentTime
+    else {
+      // ogscript.debug("2");
       return true;
     }
+  } else {
+    ogscript.putObject("lastCommandSentTime", new Date());
+    // ogscript.debug("1");
+    return true;
   }
+}
 
-  return {
-    getVolume: getVolume,
-    setVolume: setVolume,
-    getPowerState: getPowerState,
-    turnOn: turnOn,
-    turnOff: turnOff,
-    sendToTV: sendToTV,
-    getChecksum: getChecksum
-  };
+return {
+  getVolume: getVolume,
+  setVolume: setVolume,
+  getPowerState: getPowerState,
+  turnOn: turnOn,
+  turnOff: turnOff,
+  sendToTV: sendToTV,
+  getChecksum: getChecksum
+};
 })();

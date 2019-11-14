@@ -8,13 +8,13 @@
             <constraint>On</constraint>
             <constraint>Off</constraint>
          </param>
-         <param access="1" maxlength="0" name="TimeToRun_Raw" oid="TimeToRun_Raw" type="STRING" value="10:57:50" widget="text"/>
+         <param access="1" maxlength="0" name="TimeToRun_Raw" oid="TimeToRun_Raw" type="STRING" value="11:55:24" widget="text"/>
          <param access="1" maxlength="0" name="SetTime" oid="SetTime" type="STRING" value="" widget="default"/>
          <param access="1" constraintstrict="false" constrainttype="STRING_STRING_CHOICE" maxlength="0" name="RunSchedule" oid="RunSchedule" type="STRING" value="1" widget="default">
             <constraint key="0">Display Off Schedule Not Running</constraint>
             <constraint key="1">Displays will currently turn OFF at 7pm</constraint>
          </param>
-         <param access="1" maxlength="0" name="Clock" oid="Clock" type="STRING" value="10:58:16" widget="label"/>
+         <param access="1" maxlength="0" name="Clock" oid="Clock" type="STRING" value="11:55:29" widget="label"/>
       </params>
       <api src="scripts/PlanarTVScripts.grid.js"/>
       <api src="scripts/TimeOfDayFunctions.grid.js"/>
