@@ -31,7 +31,7 @@ function callback(success, sentData, resultString, exception) {
     var updateTVAgain = ogscript.getObject('updateTVAgain');
     if (updateTVAgain.true) {
       ogscript.debug('Running setVolume() again from Callback function.');
-      tv.setVolume(params.getValue('tv1.volume', 0), updateTVAgain.tvIPAddress, updateTVAgain.listener);
+      tv.setVolume(params.getValue('tv1.volume', 0), updateTVAgain.tvIPAddress, updateTVAgain.tvId);
     }
     return resultString;
   }
@@ -48,16 +48,16 @@ var tv = (function() {
   };
 
   // This function gets the current TV volume.
-  function getVolume(tvIPAddress, listener) {
+  function getVolume(tvIPAddress, tvId) {
     logFile.write("Get Volume Button Pushed.");
     ogscript.debug("Get Volume Button Pushed.");
     // logFile.write("Final command to send to tv: " + setVolumeCommand);
     // Send command to TV now.
-    sendToTV(command.getVolume, tvIPAddress, listener);
+    sendToTV(command.getVolume, tvIPAddress, tvId);
   }
 
   // This function takes a volume INT and converts it to a string to be sent to the TV
-  function setVolume(volumeLevel, tvIPAddress, listener) {
+  function setVolume(volumeLevel, tvIPAddress, tvId) {
     hexVolume = convert.toHex(volumeLevel);
     var sendAgainAtEnd;
     var setVolumeCommand = command.setVolume + hexVolume + " " + hexVolume;
@@ -69,33 +69,33 @@ var tv = (function() {
     // ogscript.debug("Final command to send to tv: " + setVolumeCommand);
     logFile.write("Final command to send to tv: " + setVolumeCommand);
     // Send command to TV now.
-    sendToTV(setVolumeCommand, tvIPAddress, listener);
+    sendToTV(setVolumeCommand, tvIPAddress, tvId);
   }
 
   // This function gets the power state of the TV
-  function getPowerState(tvIPAddress, listener) {
+  function getPowerState(tvIPAddress, tvId) {
     var getPowerCommand = "";
     // Send command to TV now.
-    sendToTV(command.getPowerState, tvIPAddress, listener);
+    sendToTV(command.getPowerState, tvIPAddress, tvId);
   }
 
   // This function turns on the TV
-  function turnOn(tvIPAddress, listener) {
+  function turnOn(tvIPAddress, tvId) {
     // Send command to TV now.
     ogscript.debug('tv.turnOn() Running.');
-    sendToTV(command.turnOn, tvIPAddress, listener);
+    sendToTV(command.turnOn, tvIPAddress, tvId);
   }
 
   // This function turns on the TV
-  function turnOff(tvIPAddress, listener) {
+  function turnOff(tvIPAddress, tvId) {
     ogscript.debug('tv.turnOff() Running.');
     // Send command to TV now.
-    sendToTV(command.turnOff, tvIPAddress, listener);
+    sendToTV(command.turnOff, tvIPAddress, tvId);
   }
 
   // This function sends a passed command to the TV.
-  function sendToTV(command, tvIPAddress, ln) {
-    var listener = ogscript.getObject(ln);
+  function sendToTV(command, tvIPAddress, tvId) {
+    var listener = ogscript.getObject('tvListener' + tvId);
     // If readyToSend, send.
     if (readyToSend()) {
       if (listener != null) {
@@ -115,7 +115,7 @@ var tv = (function() {
         "true" : true,
         "command" : command,
         "tvIPAddress" : tvIPAddress,
-        "listener" : listener
+        "tvId" : tvId
       };
       ogscript.putObject("updateTVAgain", updateTVAgain);
       ogscript.debug("Not sent. updateTVAgain flag set to True.");

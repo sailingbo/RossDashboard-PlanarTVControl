@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><abs contexttype="opengear" id="_top">
+   <timer id="Clock" pattern="HH:mm:ss" rate="500">
+      <timertask tasktype="ogparamset">params.setValue('Clock', 0, event.getDisplay());</timertask>
+   </timer>
+   <meta>
+      <params>
+         <param access="1" constrainttype="STRING_CHOICE" maxlength="0" name="TestToggle" oid="TestToggle" type="STRING" value="On" widget="radio-toggle">
+            <constraint>On</constraint>
+            <constraint>Off</constraint>
+         </param>
+         <param access="1" maxlength="0" name="TimeToRun_Raw" oid="TimeToRun_Raw" type="STRING" value="10:57:50" widget="text"/>
+         <param access="1" maxlength="0" name="SetTime" oid="SetTime" type="STRING" value="" widget="default"/>
+         <param access="1" constraintstrict="false" constrainttype="STRING_STRING_CHOICE" maxlength="0" name="RunSchedule" oid="RunSchedule" type="STRING" value="1" widget="default">
+            <constraint key="0">Display Off Schedule Not Running</constraint>
+            <constraint key="1">Displays will currently turn OFF at 7pm</constraint>
+         </param>
+         <param access="1" maxlength="0" name="Clock" oid="Clock" type="STRING" value="10:58:16" widget="label"/>
+      </params>
+      <api src="scripts/PlanarTVScripts.grid.js"/>
+      <api src="scripts/TimeOfDayFunctions.grid.js"/>
+      <api src="scripts/logfile.js"/>
+   </meta>
+   <table height="421" left="165" top="516" width="1162">
+      <tr>
+         <label colspan="3" fill="both" header="true" id="EventScheduler" name="Event Scheduler" rowspan="1" style="txt-align:center;" weightx="1.0" weighty="1.0">
+            <task tasktype="ogscript">/* from block 1003: This is a comment. */
+/*! block id=1003 !*/
+params.getValue('TimeToRun_Raw', 0)
+/*!!
+ &lt;block id="1003" type="param_getvalue" x="246" y="124" w="317" PARAM="[root, Params for TimeOfDay_v6.grid, Not In Menu, TimeToRun_Raw (TimeToRun_Raw)]" /&gt;
+!!*/
+/*!!&lt;checksum&gt;5dadeb64b639e121833b2904becb408b&lt;/checksum&gt;!!*/</task>
+         </label>
+      </tr>
+      <tr>
+         <label colspan="1" fill="both" name="What time would you like to run the event? (HH:MM:SS)" rowspan="1" style="txt-align:west;" weightx="1.0" weighty="1.0"/>
+         <param colspan="1" expand="true" fill="both" oid="TimeToRun_Raw" rowspan="1" weightx="1.0" weighty="1.0"/>
+         <dropspot colspan="1" fill="both" rowspan="1" weightx="1.0" weighty="1.0"/>
+      </tr>
+      <tr>
+         <label colspan="1" fill="both" name="Time Set:" rowspan="1" weightx="1.0" weighty="1.0"/>
+         <param colspan="1" expand="true" fill="both" oid="SetTime" rowspan="1" weightx="1.0" weighty="1.0" widget="label">
+            <task tasktype="ogscript"/>
+         </param>
+         <dropspot colspan="1" fill="both" rowspan="1" weightx="1.0" weighty="1.0"/>
+      </tr>
+      <tr>
+         <button buttontype="push" colspan="1" fill="both" gpi="turnOffTVs" name="Turn Displays Off" rowspan="1" weightx="1.0" weighty="1.0">
+            <task tasktype="ogscript">setTimeout(ogscript.debug('Hi.'), 1000);</task>
+         </button>
+         <dropspot colspan="1" fill="both" rowspan="1" weightx="1.0" weighty="1.0"/>
+         <dropspot colspan="1" fill="both" rowspan="1" weightx="1.0" weighty="1.0"/>
+      </tr>
+      <tr>
+         <button buttontype="push" colspan="3" height="160" id="ScheduleButton" left="175" name="Schedule Today" style="bg#262626;" top="252" width="645">
+            <task tasktype="ogscript">scheduleToday('turnOff', '1', params.getValue('TimeToRun_Raw', 0));
+scheduleToday('turnOff', '2', params.getValue('TimeToRun_Raw', 0));</task>
+         </button>
+      </tr>
+   </table>
+   <param expand="true" height="86" left="546" oid="Clock" style="style:timerLabel" top="332" width="479"/>
+   <param expand="true" height="118" left="361" name="" oid="RunSchedule" showlabel="false" style="style:toggleButton;look:flat;t:bg#E90404;t:look:flat;" top="1079" widget="toggle" width="504"/>
+</abs>
