@@ -11,14 +11,14 @@
          <param access="1" maxlength="0" name="IntegerToConvert" oid="IntegerToConvert" type="STRING" value="63" widget="text"/>
          <param access="1" maxlength="0" name="Converted Into Hex:" oid="Converted_Into_Hex" type="STRING" value="" widget="label"/>
          <param access="1" maxlength="0" name="HexToConvert" oid="HexToConvert" type="STRING" value="63" widget="text"/>
-         <param access="1" constraint="0.0;100.0;0.0;100.0;1" constrainttype="INT_STEP_RANGE" name="tv1.volume" oid="tv1.volume" precision="0" type="INT16" value="53" widget="slider-vertical"/>
-         <param access="1" constrainttype="INT_NULL" name="tv1.volumeAfterMute" oid="tv1.volumeAfterMute" precision="0" type="INT16" value="39" widget="default"/>
+         <param access="1" constraint="0.0;100.0;0.0;100.0;1" constrainttype="INT_STEP_RANGE" name="tv1.volume" oid="tv1.volume" precision="0" type="INT16" value="21" widget="slider-vertical"/>
+         <param access="1" constrainttype="INT_NULL" name="tv1.volumeAfterMute" oid="tv1.volumeAfterMute" precision="0" type="INT16" value="37" widget="default"/>
          <param access="1" maxlength="0" name="messageToLog" oid="messageToLog" type="STRING" value="And more." widget="text"/>
          <param access="1" maxlength="0" name="TV1_IP" oid="TV1_IP" type="STRING" value="192.168.100.228" widget="default"/>
          <param access="1" maxlength="0" name="TV2_IP" oid="TV2_IP" type="STRING" value="192.168.100.229" widget="default"/>
          <param access="1" constraint="0.0;100.0;0.0;100.0;1" constrainttype="INT_STEP_RANGE" name="tv2.volume" oid="tv2.volume" precision="0" type="INT16" value="0" widget="slider-vertical"/>
          <param access="1" constrainttype="INT_NULL" name="tv2.volumeAfterMute" oid="tv2.volumeAfterMute" precision="0" type="INT16" value="10" widget="default"/>
-         <param access="1" constraintstrict="false" constrainttype="STRING_STRING_CHOICE" maxlength="0" name="TV 1 Mute" oid="TV1_MUTE" type="STRING" value="0.0" widget="default">
+         <param access="1" constraintstrict="false" constrainttype="STRING_STRING_CHOICE" maxlength="0" name="TV 1 Mute" oid="TV1_MUTE" type="STRING" value="0" widget="default">
             <constraint key="0">MUTE OFF</constraint>
             <constraint key="1">MUTE ON</constraint>
          </param>
@@ -122,12 +122,12 @@ else if (event.isDisconnectEvent())
       </tr>
       <tr>
          <button buttontype="push" colspan="3" fill="both" id="power.on" name="Power On" style="bg#timerfg;font:bold;size:Normal;">
-            <task tasktype="ogscript">rosstalk.sendAsBytes("192.168.100.228", 5000, "A6 01 00 00 00 04 01 18 02 B8", null);</task>
+            <task tasktype="ogscript">tv.turnOn(params.getParam("_top", 'TV1_IP', 0).getValue(), 'listener_tv1');</task>
          </button>
       </tr>
       <tr>
          <button buttontype="push" colspan="3" fill="both" id="power.off" name="Power Off" style="bg#FF0000;font:bold;size:Normal;">
-            <task tasktype="ogscript">rosstalk.sendAsBytes("192.168.100.228", 5000, "A6 01 00 00 00 04 01 18 01 B8", null);</task>
+            <task tasktype="ogscript">tv.turnOff(params.getParam("_top", 'TV1_IP', 0).getValue(), 'listener_tv1');</task>
          </button>
       </tr>
       <tr>

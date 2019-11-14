@@ -28,7 +28,7 @@ function callback(success, sentData, resultString, exception) {
     // ogscript.debug("Resulting Hex String: " + hexString);
     // ogscript.debug("Volume Percentage: " + percentageVolume + "%");
     // if updateTVAgain is true, run the SetVolumeCommand again.
-    var updateTVAgain = getObject('updateTVAgain');
+    var updateTVAgain = ogscript.getObject('updateTVAgain');
     if (updateTVAgain.true) {
       ogscript.debug('Running setVolume() again from Callback function.');
       tv.setVolume(params.getValue('tv1.volume', 0), updateTVAgain.tvIPAddress, updateTVAgain.listener);
@@ -65,7 +65,7 @@ var tv = (function() {
     // ogscript.debug("Command to send before checksum: " + setVolumeCommand);
     var checksum = getChecksum(setVolumeCommand.replace(/\s/g, "")).toUpperCase();
     // ogscript.debug("Checksum: " + checksum);
-    var setVolumeCommand = setVolumeCommand + " " + checksum;
+    setVolumeCommand = setVolumeCommand + " " + checksum;
     // ogscript.debug("Final command to send to tv: " + setVolumeCommand);
     logFile.write("Final command to send to tv: " + setVolumeCommand);
     // Send command to TV now.
@@ -94,8 +94,8 @@ var tv = (function() {
   }
 
   // This function sends a passed command to the TV.
-  function sendToTV(command, tvIPAddress, listener) {
-    var listener = ogscript.getObject(listener);
+  function sendToTV(command, tvIPAddress, ln) {
+    var listener = ogscript.getObject(ln);
     // If readyToSend, send.
     if (readyToSend()) {
       if (listener != null) {
@@ -116,7 +116,7 @@ var tv = (function() {
         "command" : command,
         "tvIPAddress" : tvIPAddress,
         "listener" : listener
-      }
+      };
       ogscript.putObject("updateTVAgain", updateTVAgain);
       ogscript.debug("Not sent. updateTVAgain flag set to True.");
       ogscript.debug(updateTVAgain.true);
@@ -134,7 +134,7 @@ var tv = (function() {
       });
 
       lrc = lrc.toString(16);
-      if (lrc.length % 2) lrc = "0" + lrc;
+      if (lrc.length % 2) { lrc = "0" + lrc; }
       return lrc;
     } else {
       ogscript.debug("Hexstring is null.");
@@ -150,17 +150,17 @@ var tv = (function() {
       );
       ogscript.debug(new Date() - ogscript.getObject("lastCommandSentTime"));
       if (new Date() - ogscript.getObject("lastCommandSentTime") < 250) {
-        ogscript.debug("3");
+        // ogscript.debug("3");
         return false;
       }
       // if command wasn't sent recently, return true and update lastCommandSentTime
       else {
-        ogscript.debug("2");
+        // ogscript.debug("2");
         return true;
       }
     } else {
       ogscript.putObject("lastCommandSentTime", new Date());
-      ogscript.debug("1");
+      // ogscript.debug("1");
       return true;
     }
   }
