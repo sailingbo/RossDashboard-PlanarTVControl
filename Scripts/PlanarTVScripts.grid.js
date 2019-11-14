@@ -1,8 +1,8 @@
 /**
  * This creates a tv module that sends commands to Planar 4k Simplicity Series TVs
- * tv.getVolume(tvIPAddress, listener)
- * tv.setVolume(volumeLevel as INT, tvIPAddress, listener)
- * tv.SendToTV(command, tvIPAddress, listener)
+ * tv.getVolume(tvId)
+ * tv.setVolume(volumeLevel as INT, tvId)
+ * tv.SendToTV(command, tvId)
  * tv.getChecksum(hexString) returns hexstring + checksum at the end.
  *
  * The responses from the TV are handled in the Dashboard Panel's listener function.
@@ -31,7 +31,7 @@ function callback(success, sentData, resultString, exception) {
     var updateTVAgain = ogscript.getObject('updateTVAgain');
     if (updateTVAgain.true) {
       ogscript.debug('Running setVolume() again from Callback function.');
-      tv.setVolume(params.getValue('tv1.volume', 0), updateTVAgain.tvIPAddress, updateTVAgain.tvId);
+      tv.setVolume(params.getValue('tv1.volume', 0), updateTVAgain.tvId);
     }
     return resultString;
   }
@@ -48,16 +48,16 @@ var tv = (function() {
   };
 
   // This function gets the current TV volume.
-  function getVolume(tvIPAddress, tvId) {
+  function getVolume(tvId) {
     logFile.write("Get Volume Button Pushed.");
     ogscript.debug("Get Volume Button Pushed.");
     // logFile.write("Final command to send to tv: " + setVolumeCommand);
     // Send command to TV now.
-    sendToTV(command.getVolume, tvIPAddress, tvId);
+    sendToTV(command.getVolume, tvId);
   }
 
   // This function takes a volume INT and converts it to a string to be sent to the TV
-  function setVolume(volumeLevel, tvIPAddress, tvId) {
+  function setVolume(volumeLevel, tvId) {
     hexVolume = convert.toHex(volumeLevel);
     var sendAgainAtEnd;
     var setVolumeCommand = command.setVolume + hexVolume + " " + hexVolume;
@@ -69,32 +69,32 @@ var tv = (function() {
     // ogscript.debug("Final command to send to tv: " + setVolumeCommand);
     logFile.write("Final command to send to tv: " + setVolumeCommand);
     // Send command to TV now.
-    sendToTV(setVolumeCommand, tvIPAddress, tvId);
+    sendToTV(setVolumeCommand, tvId);
   }
 
   // This function gets the power state of the TV
-  function getPowerState(tvIPAddress, tvId) {
+  function getPowerState(tvId) {
     var getPowerCommand = "";
     // Send command to TV now.
-    sendToTV(command.getPowerState, tvIPAddress, tvId);
+    sendToTV(command.getPowerState, tvId);
   }
 
   // This function turns on the TV
-  function turnOn(tvIPAddress, tvId) {
+  function turnOn(tvId) {
     // Send command to TV now.
     ogscript.debug('tv.turnOn() Running.');
-    sendToTV(command.turnOn, tvIPAddress, tvId);
+    sendToTV(command.turnOn, tvId);
   }
 
   // This function turns on the TV
-  function turnOff(tvIPAddress, tvId) {
+  function turnOff(tvId) {
     ogscript.debug('tv.turnOff() Running.');
     // Send command to TV now.
-    sendToTV(command.turnOff, tvIPAddress, tvId);
+    sendToTV(command.turnOff, tvId);
   }
 
   // This function sends a passed command to the TV.
-  function sendToTV(command, tvIPAddress, tvId) {
+  function sendToTV(command, tvId) {
     var listener = ogscript.getObject('tvListener' + tvId);
     // If readyToSend, send.
     if (readyToSend()) {
@@ -114,7 +114,6 @@ var tv = (function() {
       var updateTVAgain = {
         "true" : true,
         "command" : command,
-        "tvIPAddress" : tvIPAddress,
         "tvId" : tvId
       };
       ogscript.putObject("updateTVAgain", updateTVAgain);
