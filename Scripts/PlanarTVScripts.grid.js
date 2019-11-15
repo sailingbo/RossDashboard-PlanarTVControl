@@ -47,6 +47,8 @@ var tv = (function() {
     turnOn: "A6 01 00 00 00 04 01 18 02 BB"
   };
 
+  var
+
   // This function gets the current TV volume.
   function getVolume(tvId) {
     logFile.write("Get Volume Button Pushed.");
