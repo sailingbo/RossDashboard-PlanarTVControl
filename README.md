@@ -4,10 +4,14 @@
 ---
 **The functions available in the PlanarTVScripts.grid.js file include:**
 
-    tv.getVolume(tvIPAddress, listener)
-    tv.setVolume(volumeLevel as INT, tvIPAddress, listener)
-    tv.sendToTV(command, tvIPAddress, listener)
+    tv.getVolume(tvId)
+    tv.setVolume(volumeLevel as INT, tvId)
+    tv.getPowerState(tvId)
+    tv.turnOn(tvId)
+    tv.turnOff(tvId)
+    tv.sendToTV(command, tvId)
     tv.getChecksum(hexString)
+    tv.readyToSend() returns true/false
 
 ---
 
