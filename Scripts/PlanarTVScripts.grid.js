@@ -44,7 +44,7 @@ var tv = function() {
     getPowerState: "A6 01 00 00 00 03 01 19 BC",
     setVolume: "A6 01 00 00 00 05 01 44 ",
     turnOff: "A6 01 00 00 00 04 01 18 01 BB",
-    turnOn: "A6 01 00 00 00 04 01 18 02 BB"
+    turnOn: "A6 01 00 00 00 04 01 18 02 B8"
   };
 
   // This function gets the current TV volume.
