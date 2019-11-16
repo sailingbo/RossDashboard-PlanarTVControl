@@ -37,7 +37,7 @@ function callback(success, sentData, resultString, exception) {
   }
 }
 
-var tv = (function() {
+var tv = function() {
   //Serial commands for Planar Simplicity 4k Series tvs.
   var command = {
     getVolume: "A6 01 00 00 00 03 01 45 E0",
@@ -53,52 +53,52 @@ var tv = (function() {
     ogscript.debug("Get Volume Button Pushed.");
     // logFile.write("Final command to send to tv: " + setVolumeCommand);
     // Send command to TV now.
-    sendToTV(command.getVolume, tvId);
+    tv.sendToTV(command.getVolume, tvId);
   }
 
   // This function takes a volume INT and converts it to a string to be sent to the TV
   function setVolume(volumeLevel, tvId) {
-    hexVolume = convert.toHex(volumeLevel);
+    var hexVolume = convert.toHex(volumeLevel);
     var sendAgainAtEnd;
     var setVolumeCommand = command.setVolume + hexVolume + " " + hexVolume;
     // ogscript.debug("Volume in hex: " + hexVolume);
     // ogscript.debug("Command to send before checksum: " + setVolumeCommand);
-    var checksum = getChecksum(setVolumeCommand.replace(/\s/g, "")).toUpperCase();
+    var checksum = tv.getChecksum(setVolumeCommand.replace(/\s/g, "")).toUpperCase();
     // ogscript.debug("Checksum: " + checksum);
     setVolumeCommand = setVolumeCommand + " " + checksum;
     // ogscript.debug("Final command to send to tv: " + setVolumeCommand);
     logFile.write("Final command to send to tv: " + setVolumeCommand);
     // Send command to TV now.
-    sendToTV(setVolumeCommand, tvId);
+    tv.sendToTV(setVolumeCommand, tvId);
   }
 
   // This function gets the power state of the TV
   function getPowerState(tvId) {
     var getPowerCommand = "";
     // Send command to TV now.
-    sendToTV(command.getPowerState, tvId);
+    tv.sendToTV(command.getPowerState, tvId);
   }
 
   // This function turns on the TV
   function turnOn(tvId) {
     // Send command to TV now.
     ogscript.debug('tv.turnOn() Running.');
-    sendToTV(command.turnOn, tvId);
+    tv.sendToTV(command.turnOn, tvId);
   }
 
   // This function turns on the TV
   function turnOff(tvId) {
     ogscript.debug('tv.turnOff() Running.');
     // Send command to TV now.
-    sendToTV(command.turnOff, tvId);
+    tv.sendToTV(command.turnOff, tvId);
   }
 
   // This function sends a passed command to the TV.
   function sendToTV(command, tvId) {
-    var listener = ogscript.getObject('listener_tv' + tvId);
+    var listener = ogscript.getObject("listener_tv" + tvId);
     // If readyToSend, send.
-    if (readyToSend()) {
-      if (listener != null) {
+    if (tv.readyToSend()) {
+      if (listener !== null) {
         logFile.write("Command sent to TV: " + command);
         listener.writeAsBytes(command);
         ogscript.putObject("updateTVAgain.true", false);
@@ -124,7 +124,7 @@ var tv = (function() {
 
 // This function calculates the proper checksum (LRC) for Planar TVs
 function getChecksum(hexstring) {
-  if (hexstring != "") {
+  if (hexstring !== "") {
     var s = hexstring.match(/../g);
     var lrc = 0;
     s.forEach(function(hexbyte) {
@@ -175,4 +175,4 @@ return {
   sendToTV: sendToTV,
   getChecksum: getChecksum
 };
-})();
+}();

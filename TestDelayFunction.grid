@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><abs contexttype="opengear" id="_top">
-   <meta>
-      <api src="scripts/PlanarTVScripts.grid.js"/>
-   </meta>
-   <button buttontype="push" height="205" left="284" name="Do Something" top="299" width="569">
-      <task tasktype="ogscript">ogscript.asyncExec( function () { ogscript.debug('Did it work?'); }, 1500);</task>
-   </button>
-</abs>
