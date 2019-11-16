@@ -14,7 +14,7 @@
             <constraint key="0">Display Off Schedule Not Running</constraint>
             <constraint key="1">Displays will currently turn OFF at 7pm</constraint>
          </param>
-         <param access="1" maxlength="0" name="Clock" oid="Clock" type="STRING" value="11:55:29" widget="label"/>
+         <param access="1" maxlength="0" name="Clock" oid="Clock" type="STRING" value="05:57:16" widget="label"/>
       </params>
       <api src="scripts/PlanarTVScripts.grid.js"/>
       <api src="scripts/TimeOfDayFunctions.grid.js"/>
